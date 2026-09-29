@@ -1,0 +1,6 @@
+mediapipe==0.10.21
+opencv-contrib-python==4.11.0.86
+mss==10.2.0
+PyAudioWPatch==0.2.12.8
+faster-whisper==1.2.1
+scipy==1.17.1
