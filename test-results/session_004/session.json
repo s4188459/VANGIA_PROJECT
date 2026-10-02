@@ -1,0 +1,609 @@
+{
+  "schema_version": "3.0",
+  "status": "closed",
+  "session_id": "session_004",
+  "participant_id": "Binh",
+  "started_at_local": "2026-10-01T13:06:54.831441+07:00",
+  "ended_at_local": "2026-10-01T13:07:56.283818+07:00",
+  "duration_s": 61.45150210000065,
+  "region": {
+    "left": 1541,
+    "top": 558,
+    "width": 1151,
+    "height": 643
+  },
+  "options": {
+    "video": false,
+    "system_audio": false,
+    "microphone": false,
+    "transcript": false
+  },
+  "consent": {
+    "confirmed": true,
+    "confirmed_at_local": "2026-10-01T13:06:54.831441+07:00"
+  },
+  "components": {},
+  "warnings": [],
+  "errors": [],
+  "drops": {},
+  "audio": {
+    "file": null,
+    "channels": {},
+    "intervals": []
+  },
+  "transcription": {
+    "live": {},
+    "final": {
+      "status": "not_started"
+    }
+  },
+  "observable_events": [
+    {
+      "start_time_s": 3.76,
+      "end_time_s": 16.658,
+      "action": "head_mostly_still",
+      "duration_s": 12.898000000000001,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 16.869,
+      "end_time_s": 18.481,
+      "action": "head_turned_left",
+      "duration_s": 1.6120000000000019,
+      "peak_strength": 2.649069239337963,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 18.32,
+      "end_time_s": 18.481,
+      "action": "shaking_head",
+      "duration_s": 0.16100000000000136,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 16.782,
+      "end_time_s": 18.531,
+      "action": "eyes_looking_left",
+      "duration_s": 1.7489999999999988,
+      "peak_strength": 2.6616211111346884,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 16.606,
+      "end_time_s": 19.313,
+      "action": "head_movement_detected",
+      "duration_s": 2.706999999999997,
+      "peak_strength": 12.474576982237018,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 19.159,
+      "end_time_s": 20.018,
+      "action": "asymmetric_brow_movement",
+      "duration_s": 0.8590000000000018,
+      "peak_strength": 1.57089040407704,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 19.125,
+      "end_time_s": 20.146,
+      "action": "asymmetric_eye_closure",
+      "duration_s": 1.0210000000000008,
+      "peak_strength": 1.7821587026119232,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 18.728,
+      "end_time_s": 20.27,
+      "action": "head_turned_right",
+      "duration_s": 1.541999999999998,
+      "peak_strength": 2.622529922192574,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 20.146,
+      "end_time_s": 20.464,
+      "action": "shaking_head",
+      "duration_s": 0.31799999999999784,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 19.971,
+      "end_time_s": 21.017,
+      "action": "head_movement_detected",
+      "duration_s": 1.0459999999999994,
+      "peak_strength": 14.268643623114968,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 22.015,
+      "end_time_s": 22.103,
+      "action": "shaking_head",
+      "duration_s": 0.08800000000000097,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 20.583,
+      "end_time_s": 22.196,
+      "action": "head_turned_left",
+      "duration_s": 1.613000000000003,
+      "peak_strength": 2.39890888666958,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 20.418,
+      "end_time_s": 22.196,
+      "action": "eyes_looking_left",
+      "duration_s": 1.7780000000000022,
+      "peak_strength": 2.756741978228092,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 22.196,
+      "end_time_s": 22.949,
+      "action": "head_movement_detected",
+      "duration_s": 0.7530000000000001,
+      "peak_strength": 19.679028495906657,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 22.905,
+      "end_time_s": 23.697,
+      "action": "asymmetric_brow_movement",
+      "duration_s": 0.791999999999998,
+      "peak_strength": 1.333796957300769,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 22.866,
+      "end_time_s": 23.786,
+      "action": "head_raised",
+      "duration_s": 0.9200000000000017,
+      "peak_strength": 1.1085962544391936,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 22.819,
+      "end_time_s": 23.786,
+      "action": "asymmetric_eye_closure",
+      "duration_s": 0.9670000000000023,
+      "peak_strength": 1.601031482219696,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 22.332,
+      "end_time_s": 23.902,
+      "action": "head_turned_right",
+      "duration_s": 1.5700000000000003,
+      "peak_strength": 2.5516483390171465,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 23.786,
+      "end_time_s": 23.945,
+      "action": "shaking_head",
+      "duration_s": 0.15899999999999892,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 23.697,
+      "end_time_s": 24.705,
+      "action": "head_movement_detected",
+      "duration_s": 1.0079999999999991,
+      "peak_strength": 17.143390495133445,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 24.158,
+      "end_time_s": 25.498,
+      "action": "head_turned_left",
+      "duration_s": 1.3399999999999999,
+      "peak_strength": 2.4619773152866853,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 24.027,
+      "end_time_s": 25.582,
+      "action": "eyes_looking_left",
+      "duration_s": 1.5549999999999997,
+      "peak_strength": 2.7611561492085457,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 25.334,
+      "end_time_s": 25.705,
+      "action": "shaking_head",
+      "duration_s": 0.37099999999999866,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 25.876,
+      "end_time_s": 26.601,
+      "action": "eyes_looking_down",
+      "duration_s": 0.7249999999999979,
+      "peak_strength": 1.1622864504655204,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 25.957,
+      "end_time_s": 26.639,
+      "action": "head_raised",
+      "duration_s": 0.6819999999999986,
+      "peak_strength": 1.3565995996931421,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 25.828,
+      "end_time_s": 26.734,
+      "action": "head_turned_right",
+      "duration_s": 0.9060000000000024,
+      "peak_strength": 2.526648639268834,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 26.639,
+      "end_time_s": 27.346,
+      "action": "shaking_head",
+      "duration_s": 0.7070000000000007,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 26.855,
+      "end_time_s": 28.092,
+      "action": "eyes_looking_left",
+      "duration_s": 1.2369999999999983,
+      "peak_strength": 2.819800116121769,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 27.028,
+      "end_time_s": 28.14,
+      "action": "head_turned_left",
+      "duration_s": 1.1120000000000019,
+      "peak_strength": 2.2361577213402484,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 16.827,
+      "end_time_s": 28.471,
+      "action": "mouth_movement_detected",
+      "duration_s": 11.643999999999998,
+      "peak_strength": 7.617982112181684,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 25.828,
+      "end_time_s": 28.56,
+      "action": "head_movement_detected",
+      "duration_s": 2.7319999999999993,
+      "peak_strength": 18.881203497312494,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 28.053,
+      "end_time_s": 28.647,
+      "action": "shaking_head",
+      "duration_s": 0.5939999999999976,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 28.521,
+      "end_time_s": 29.029,
+      "action": "eyes_looking_right",
+      "duration_s": 0.5079999999999991,
+      "peak_strength": 1.4140305117536554,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 28.224,
+      "end_time_s": 29.206,
+      "action": "head_turned_right",
+      "duration_s": 0.9819999999999993,
+      "peak_strength": 1.521718150527381,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 29.206,
+      "end_time_s": 29.735,
+      "action": "shaking_head",
+      "duration_s": 0.5289999999999999,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 29.387,
+      "end_time_s": 30.561,
+      "action": "eyes_looking_left",
+      "duration_s": 1.1739999999999995,
+      "peak_strength": 2.5737432514627776,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 29.387,
+      "end_time_s": 30.609,
+      "action": "head_turned_left",
+      "duration_s": 1.2220000000000013,
+      "peak_strength": 2.435945474004478,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 30.516,
+      "end_time_s": 31.032,
+      "action": "shaking_head",
+      "duration_s": 0.5160000000000018,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 31.032,
+      "end_time_s": 31.613,
+      "action": "eyes_looking_right",
+      "duration_s": 0.5809999999999995,
+      "peak_strength": 1.782488259036417,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 30.769,
+      "end_time_s": 31.742,
+      "action": "head_turned_right",
+      "duration_s": 0.9730000000000025,
+      "peak_strength": 2.008654573688929,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 29.34,
+      "end_time_s": 32.005,
+      "action": "mouth_movement_detected",
+      "duration_s": 2.6650000000000027,
+      "peak_strength": 5.883955210447311,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 31.698,
+      "end_time_s": 32.267,
+      "action": "shaking_head",
+      "duration_s": 0.5690000000000026,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 29.114,
+      "end_time_s": 32.816,
+      "action": "head_movement_detected",
+      "duration_s": 3.7020000000000017,
+      "peak_strength": 14.51565288766634,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 35.323,
+      "end_time_s": 35.676,
+      "action": "mouth_funnel_detected",
+      "duration_s": 0.35300000000000153,
+      "peak_strength": 1.2995811241368453,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 35.576,
+      "end_time_s": 36.418,
+      "action": "head_mostly_still",
+      "duration_s": 0.8419999999999987,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 35.323,
+      "end_time_s": 36.48,
+      "action": "jaw_opened",
+      "duration_s": 1.1569999999999965,
+      "peak_strength": 3.8541564787738025,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 35.323,
+      "end_time_s": 36.48,
+      "action": "mouth_movement_detected",
+      "duration_s": 1.1569999999999965,
+      "peak_strength": 6.423594131289671,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 37.334,
+      "end_time_s": 37.484,
+      "action": "blinking",
+      "duration_s": 0.14999999999999858,
+      "peak_strength": 1.020667552947998,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 38.833,
+      "end_time_s": 38.998,
+      "action": "blinking",
+      "duration_s": 0.16499999999999915,
+      "peak_strength": 1.1024324460463089,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 38.672,
+      "end_time_s": 39.104,
+      "action": "head_mostly_still",
+      "duration_s": 0.43200000000000216,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 39.257,
+      "end_time_s": 39.365,
+      "action": "blinking",
+      "duration_s": 0.10800000000000409,
+      "peak_strength": 1.0291844064539128,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 39.632,
+      "end_time_s": 40.397,
+      "action": "head_mostly_still",
+      "duration_s": 0.7650000000000006,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 40.706,
+      "end_time_s": 41.026,
+      "action": "eyes_looking_down",
+      "duration_s": 0.3200000000000003,
+      "peak_strength": 1.0825066765149436,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 41.976,
+      "end_time_s": 42.163,
+      "action": "blinking",
+      "duration_s": 0.1869999999999976,
+      "peak_strength": 1.0243468934839421,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 41.349,
+      "end_time_s": 41.976,
+      "action": "head_mostly_still",
+      "duration_s": 0.6270000000000024,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 41.933,
+      "end_time_s": 42.401,
+      "action": "eyes_looking_down",
+      "duration_s": 0.4680000000000035,
+      "peak_strength": 1.2576493620872498,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 41.882,
+      "end_time_s": 43.021,
+      "action": "jaw_opened",
+      "duration_s": 1.139000000000003,
+      "peak_strength": 2.042534991633147,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 41.775,
+      "end_time_s": 43.438,
+      "action": "mouth_movement_detected",
+      "duration_s": 1.6630000000000038,
+      "peak_strength": 3.404224986055245,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 43.228,
+      "end_time_s": 44.0,
+      "action": "brows_raised",
+      "duration_s": 0.7719999999999985,
+      "peak_strength": 1.0859506052279697,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 43.754,
+      "end_time_s": 46.105,
+      "action": "head_mostly_still",
+      "duration_s": 2.350999999999999,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 44.35,
+      "end_time_s": 46.816,
+      "action": "jaw_opened",
+      "duration_s": 2.466000000000001,
+      "peak_strength": 2.372583046089858,
+      "status": "interrupted"
+    },
+    {
+      "start_time_s": 44.054,
+      "end_time_s": 46.816,
+      "action": "mouth_movement_detected",
+      "duration_s": 2.7620000000000005,
+      "peak_strength": 7.666807342320681,
+      "status": "interrupted"
+    },
+    {
+      "start_time_s": 42.163,
+      "end_time_s": 46.816,
+      "action": "frequent_blinking",
+      "duration_s": 4.653000000000006,
+      "peak_strength": 1.0,
+      "status": "interrupted"
+    },
+    {
+      "start_time_s": 46.816,
+      "end_time_s": 47.029,
+      "action": "face_not_detected",
+      "duration_s": 0.21300000000000097,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 51.662,
+      "end_time_s": 51.662,
+      "action": "face_detected_again",
+      "duration_s": 0.0,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 51.662,
+      "end_time_s": 52.519,
+      "action": "mouth_movement_detected",
+      "duration_s": 0.8569999999999993,
+      "peak_strength": 7.600987299034993,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 51.728,
+      "end_time_s": 53.51,
+      "action": "head_movement_detected",
+      "duration_s": 1.7819999999999965,
+      "peak_strength": 19.955413845563402,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 54.836,
+      "end_time_s": 56.518,
+      "action": "mouth_movement_detected",
+      "duration_s": 1.6820000000000022,
+      "peak_strength": 1.0812645157178244,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 54.893,
+      "end_time_s": 61.407,
+      "action": "head_mostly_still",
+      "duration_s": 6.513999999999996,
+      "peak_strength": 1.0,
+      "status": "interrupted"
+    }
+  ],
+  "media_stats": {},
+  "drop_details": [],
+  "runtime": {
+    "python": "3.12.14",
+    "packages": {
+      "mediapipe": "0.10.21",
+      "opencv-contrib-python": "4.11.0.86",
+      "faster-whisper": "1.2.1",
+      "ctranslate2": "4.8.2",
+      "mss": "10.2.0",
+      "numpy": "1.26.4",
+      "scipy": "1.17.1"
+    }
+  },
+  "interpretation_boundary": "Observable data only; no psychological or confusion inference."
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": "3.0",
+  "status": "recording",
+  "session_id": "session_005",
+  "participant_id": "Speaker",
+  "started_at_local": "2026-10-01T13:15:35.088208+07:00",
+  "ended_at_local": null,
+  "duration_s": 0.0,
+  "region": {
+    "left": 1099,
+    "top": 293,
+    "width": 1745,
+    "height": 993
+  },
+  "options": {
+    "video": false,
+    "system_audio": true,
+    "microphone": false,
+    "transcript": false
+  },
+  "consent": {
+    "confirmed": true,
+    "confirmed_at_local": "2026-10-01T13:15:35.088208+07:00"
+  },
+  "components": {
+    "system_audio": {
+      "state": "stopped",
+      "message": ""
+    },
+    "audio": {
+      "state": "stopped",
+      "message": ""
+    }
+  },
+  "warnings": [],
+  "errors": [],
+  "drops": {},
+  "audio": {
+    "file": "audio.wav",
+    "sample_rate": 48000,
+    "channels": {
+      "left": "microphone/You",
+      "right": "system_audio/Student"
+    },
+    "intervals": [
+      {
+        "session_start_s": 0.0,
+        "session_end_s": 94.00863059999938,
+        "wav_start_frame": 0,
+        "wav_end_frame": 4511544
+      }
+    ]
+  },
+  "transcription": {
+    "live": {},
+    "final": {
+      "status": "not_started"
+    }
+  },
+  "observable_events": [],
+  "media_stats": {
+    "audio": {
+      "sample_rate": 48000,
+      "written_frames": 4511544,
+      "intervals": [
+        {
+          "session_start_s": 0.0,
+          "session_end_s": 94.00863059999938,
+          "wav_start_frame": 0,
+          "wav_end_frame": 4511544
+        }
+      ],
+      "source_failures": []
+    }
+  },
+  "drop_details": [],
+  "runtime": {
+    "python": "3.12.14",
+    "packages": {
+      "mediapipe": "0.10.21",
+      "opencv-contrib-python": "4.11.0.86",
+      "faster-whisper": "1.2.1",
+      "ctranslate2": "4.8.2",
+      "mss": "10.2.0",
+      "numpy": "1.26.4",
+      "scipy": "1.17.1"
+    }
+  },
+  "interpretation_boundary": "Observable data only; no psychological or confusion inference."
+}
