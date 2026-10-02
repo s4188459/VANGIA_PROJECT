@@ -1,0 +1,27 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.DS_Store
+models/*.task
+models/*.part
+models/faster-whisper-*/
+session_*/
+
+# Local tooling and private configuration
+.superpowers/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Generated recordings and local output folders
+recordings/
+outputs/
+*.wav
+*.mp4
+*.log
+Thumbs.db
