@@ -337,7 +337,7 @@ class ControlPanel:
         self._status.set(status)
         active = state in {AppState.RUNNING, AppState.PAUSED}
         shutting_down = state is AppState.SHUTTING_DOWN
-        busy = shutting_down or state is AppState.FINALIZING
+        busy = shutting_down or state in {AppState.FINALIZING, AppState.STOPPING}
         self.select_button.configure(state="disabled" if busy else "normal")
         self.folder_button.configure(state="disabled" if active or busy else "normal")
         options_valid = self.get_session_options().validation_error() is None
@@ -425,6 +425,16 @@ class ControlPanel:
             self._latest_filename = "--"
         for value in self._feature_values.values():
             value.set("--")
+
+    def run_background(self, operation, completed) -> None:
+        import threading
+        def run():
+            try:
+                result = operation()
+            except Exception as exc:
+                result = str(exc)
+            self.schedule(lambda: completed(result))
+        threading.Thread(target=run, name="session-file-close", daemon=False).start()
 
     def schedule(self, callback: Callable[[], None]) -> None:
         self._scheduler.schedule(callback)

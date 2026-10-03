@@ -11,6 +11,7 @@ from .session_types import ComponentState, ComponentStatus
 from .stereo_audio import StereoAudioWriter
 from .transcription import LocalEnglishTranscriber, TranscriptionWorker, speech_has_ended, LIVE_ENDPOINT_PAUSE_S, LIVE_MAX_WINDOW_S
 from .transcript_writer import TranscriptStore
+from .live_inference_process import ProcessEnglishTranscriber
 from .video_recorder import VideoRecorder
 
 
@@ -25,7 +26,7 @@ class SessionOrchestrator:
                  transcript_metrics_callback=lambda _metrics: None,
                  video_factory=VideoRecorder, audio_factory=AudioCaptureWorker,
                  stereo_factory=StereoAudioWriter, device_discovery=discover_default_devices,
-                 transcriber_factory=LocalEnglishTranscriber,
+                 transcriber_factory=ProcessEnglishTranscriber,
                  transcription_worker_factory=TranscriptionWorker) -> None:
         self.dataset, self.options, self.region, self.clock = dataset, options, region, clock
         self._transcript_callback, self._status_callback = transcript_callback, status_callback
@@ -37,6 +38,8 @@ class SessionOrchestrator:
         self._video = None; self._audio = []; self._stereo = None
         self._transcription = None; self._transcript_writer = None; self._closed = False
         self._component_errors = {}
+        self._stop_requested = False
+        self._stopped_at = None
 
     def _transcript_error(self, error) -> None:
         message = f"{error.get('stage', 'worker')}: {error['message']}"
@@ -78,13 +81,14 @@ class SessionOrchestrator:
                     "window_s": 1.2, "max_window_s": LIVE_MAX_WINDOW_S, "endpoint_pause_s": LIVE_ENDPOINT_PAUSE_S, "overlap_s": .75, "queue_size": 4096,
                 }})
                 def publish(segment):
+                    if self._stop_requested: return
                     self._transcript_writer.append_live(segment); self._transcript_callback(segment)
                 self._transcription = self._transcription_worker_factory(
                     transcriber,
                     publish,
                     window_s=1.2,
                     max_window_s=LIVE_MAX_WINDOW_S,
-                    speech_boundary=partial(speech_has_ended, pause_s=LIVE_ENDPOINT_PAUSE_S),
+                    speech_boundary=partial(getattr(transcriber, "speech_boundary", speech_has_ended), pause_s=LIVE_ENDPOINT_PAUSE_S),
                     overlap_s=0.75,
                     clock=self.clock.elapsed_s,
                     metrics_callback=self._transcript_metrics_callback,
@@ -93,6 +97,10 @@ class SessionOrchestrator:
                 )
                 self._transcription.start(); self._status("transcript", ComponentState.RECORDING)
             except Exception as exc:
+                if self._transcription is not None:
+                    self._transcription.request_stop(); self._transcription.stop()
+                elif "transcriber" in locals() and hasattr(transcriber, "close"):
+                    transcriber.close()
                 if self._transcript_writer: self._transcript_writer.close()
                 self._transcript_writer = None; self._transcription = None
                 self.dataset.add_error("transcript", str(exc))
@@ -134,6 +142,7 @@ class SessionOrchestrator:
                     self._status(source.value, ComponentState.UNAVAILABLE, "Default audio device unavailable")
                     continue
                 def accept(chunk):
+                    if self._stop_requested: return
                     if not self._stereo.submit(chunk):
                         self.dataset.mark_drop(f"audio.{chunk.source.value}", start_s=chunk.start_s,
                                                end_s=chunk.end_s, reason="writer_rejected")
@@ -152,6 +161,7 @@ class SessionOrchestrator:
                     self._status(source.value, ComponentState.UNAVAILABLE, str(exc))
 
     def submit_video(self, frame) -> int | None:
+        if self._stop_requested: return None
         return self._video.submit(frame) if self._video else None
 
     def pause(self) -> None:
@@ -166,10 +176,20 @@ class SessionOrchestrator:
         if self._stereo: self._stereo.resume(now)
         for worker in self._audio: worker.resume(now)
 
+    def request_stop(self) -> None:
+        if self._stop_requested: return
+        self._stop_requested = True
+        self._stopped_at = self.clock.elapsed_s()
+        for worker in self._audio:
+            if hasattr(worker, "request_stop"): worker.request_stop()
+        if self._transcription and hasattr(self._transcription, "request_stop"):
+            self._transcription.request_stop()
+
     def stop(self) -> None:
         if self._closed: return
+        self.request_stop()
         self._closed = True; errors = []
-        stopped_at = self.clock.elapsed_s()
+        stopped_at = self._stopped_at
         operations = [(worker.source.value if hasattr(worker, "source") else "audio_capture", worker.stop)
                       for worker in self._audio]
         if self._stereo: operations.append(("audio", lambda: self._stereo.stop(stopped_at)))

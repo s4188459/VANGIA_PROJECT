@@ -19,7 +19,8 @@ class CaptureRegionTests(unittest.TestCase):
                     CaptureRegion(0, 0, width, height)
 
     def test_application_states_are_distinct(self):
-        self.assertEqual(len(AppState), 6)
+        self.assertEqual(len(AppState), 7)
+        self.assertIsNot(AppState.STOPPING, AppState.FINALIZING)
         self.assertIsNot(AppState.FINALIZING, AppState.READY)
 
 

@@ -44,3 +44,15 @@ class BoundaryTests(unittest.TestCase):
         with patch('faster_whisper.vad.get_speech_timestamps',side_effect=lambda audio, options: [{'start':0,'end':len(audio)-9600}]):
             self.assertTrue(speech_has_ended(audio,16000,pause_s=.6))
             self.assertFalse(speech_has_ended(audio,16000))
+
+    def test_complete_duplicate_returns_no_empty_segment(self):
+        t=LocalEnglishTranscriber('unused',model=self.model([
+            [(5.3,5.8,' hello')],[(.1,.55,' hello')]]))
+        t.transcribe(self.chunk(0))
+        self.assertEqual(t.transcribe(self.chunk(5.25)),())
+
+    def test_nonoverlapping_chunk_keeps_same_phrase(self):
+        t=LocalEnglishTranscriber('unused',model=self.model([
+            [(5.3,5.8,' hello')],[(0,.5,' hello')]]))
+        t.transcribe(self.chunk(0))
+        self.assertEqual(t.transcribe(self.chunk(6))[0].text,'hello')

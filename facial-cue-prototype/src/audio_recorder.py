@@ -67,8 +67,11 @@ class AudioRecorder:
 
     def pause(self, timestamp_s: float) -> None: self._paused.set()
     def resume(self, timestamp_s: float) -> None: self._paused.clear()
-    def stop(self, timeout_s: float = 2.0) -> None:
+    def request_stop(self) -> None:
         self._stop.set()
+
+    def stop(self, timeout_s: float = 2.0) -> None:
+        self.request_stop()
         if self._stream:
             try: self._stream.stop_stream()
             except Exception: pass
@@ -148,8 +151,11 @@ class AudioCaptureWorker:
         self._timeline_generation += 1
         self._paused.clear()
 
-    def stop(self, timeout_s: float = 2.0) -> None:
+    def request_stop(self) -> None:
         self._stop.set()
+
+    def stop(self, timeout_s: float = 2.0) -> None:
+        self.request_stop()
         if self._thread is None:
             self._close_stream()
         elif self._thread is not threading.current_thread():

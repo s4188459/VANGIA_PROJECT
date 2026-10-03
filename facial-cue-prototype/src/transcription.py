@@ -22,7 +22,7 @@ class TranscriptionUnavailable(RuntimeError): pass
 UTTERANCE_PAUSE_S = 1.0
 ENDPOINT_CHECK_S = 0.1
 LIVE_ENDPOINT_PAUSE_S = 0.6
-LIVE_MAX_WINDOW_S = 8.0
+LIVE_MAX_WINDOW_S = 12.0
 
 
 @dataclass(frozen=True)
@@ -217,6 +217,10 @@ class TranscriptionWorker:
         self._submit_lock = threading.Lock()
         self.failure = None
         self._current = None
+        self._pending_intervals = {}
+        self._phase = "idle"
+        self._phase_at_stop = None
+        self._stop_stats = None
         self._last_metrics = None
         self._cancel = threading.Event()
         self._publish_lock = threading.Lock()
@@ -228,7 +232,14 @@ class TranscriptionWorker:
 
     def submit(self, chunk: AudioChunk) -> bool:
         with self._submit_lock:
-            return self._submit(chunk)
+            accepted = self._submit(chunk)
+            if accepted:
+                ranges = self._pending_intervals.setdefault(chunk.source.value, [])
+                if ranges and abs(ranges[-1][1] - chunk.start_s) < 1e-5:
+                    ranges[-1][1] = chunk.end_s
+                else:
+                    ranges.append([chunk.start_s, chunk.end_s])
+            return accepted
 
     def _drop(self, chunk, reason):
         if chunk is not None:
@@ -254,7 +265,8 @@ class TranscriptionWorker:
         try:
             self._process_queue()
         except Exception as exc:
-            self._report_failure(exc, "worker", self._current)
+            if not self._cancel.is_set():
+                self._report_failure(exc, "worker", self._current)
         finally:
             self._accepting = False
 
@@ -274,7 +286,9 @@ class TranscriptionWorker:
     def _process_queue(self) -> None:
         buffers: dict[AudioSource, _AudioBuffer] = {}
         while not self._cancel.is_set():
+            self._phase = "waiting_audio"
             item = self._queue.get()
+            if self._cancel.is_set(): return
             if item is None:
                 for buffer in buffers.values():
                     if buffer.end_s > buffer.processed_until_s + 1e-6:
@@ -308,6 +322,7 @@ class TranscriptionWorker:
                 if self._speech_boundary is not None and sample_count < max_samples:
                     if sample_count < buffer.next_boundary_samples:
                         break
+                    self._phase = "endpoint"
                     boundary = self._speech_boundary(buffer.samples[:sample_count], buffer.sample_rate)
                     buffer.next_boundary_samples = sample_count + max(1, round(buffer.sample_rate * ENDPOINT_CHECK_S))
                     if not boundary:
@@ -328,6 +343,7 @@ class TranscriptionWorker:
                               buffer.start_s + sample_count / buffer.sample_rate,
                               buffer.sample_rate, buffer.channels, buffer.samples[:sample_count].copy())
         started = time.perf_counter()
+        self._phase = "inference"
         try:
             for segment in self._transcriber.transcribe(combined):
                 with self._publish_lock:
@@ -341,6 +357,14 @@ class TranscriptionWorker:
                 self._report_failure(exc, "transcribe", combined)
             return
         if self._cancel.is_set(): return
+        with self._submit_lock:
+            # Successful decode coverage, including silence; not the last spoken word.
+            self._pending_intervals[combined.source.value] = [
+                [max(start, combined.end_s), end]
+                for start, end in self._pending_intervals.get(combined.source.value, [])
+                if end > combined.end_s + 1e-6
+            ]
+        self._phase = "waiting_audio"
         self.lag_s = max(0.0, self._clock() - combined.end_s)
         queued = {source.value: 0.0 for source in AudioSource}
         with self._queue.mutex:
@@ -354,7 +378,43 @@ class TranscriptionWorker:
         except Exception:
             pass
 
+    def request_stop(self) -> None:
+        if self._phase_at_stop is not None:
+            return
+        self._phase_at_stop = self._phase
+        self._cancel.set()
+        with self._submit_lock:
+            self._accepting = False
+        cancel = getattr(self._transcriber, "cancel", None)
+        if cancel is not None:
+            cancel()
+        # Wake an idle worker. A full queue already provides a wakeup.
+        try:
+            self._queue.put_nowait(None)
+        except queue.Full:
+            pass
+
+    def _stop_cancelled(self):
+        if self._stop_stats is not None:
+            return self._stop_stats
+        if self._thread:
+            self._thread.join(1.0)
+        alive = bool(self._thread and self._thread.is_alive())
+        close = getattr(self._transcriber, "close", None)
+        if close is not None:
+            close()
+        self._stop_stats = {
+            "failure": self.failure or ("Transcript worker did not exit after cancellation" if alive else None),
+            "stop_policy": "cancel_without_flush", "phase_at_stop": self._phase_at_stop,
+            "dropped_chunks": self.dropped_chunks, "last_metrics": self._last_metrics,
+            "unprocessed_audio_intervals": self._pending_intervals,
+            "coverage_complete": not any(self._pending_intervals.values()) and not self.dropped_chunks and not self.failure,
+        }
+        return self._stop_stats
+
     def stop(self, grace_s: float = 10.0) -> None:
+        if self._phase_at_stop is not None:
+            return self._stop_cancelled()
         with self._submit_lock:
             self._accepting = False
             try: self._queue.put_nowait(None)

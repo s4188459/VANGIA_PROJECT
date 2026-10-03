@@ -100,8 +100,11 @@ class MeetingTracker:
         self._pause_event.clear()
         self._emit(TrackerEventKind.RESUMED)
 
-    def stop(self) -> None:
+    def request_stop(self) -> None:
         self._stop_event.set()
+
+    def stop(self) -> None:
+        self.request_stop()
         if (
             self._thread is not None
             and self._thread.is_alive()
@@ -158,6 +161,9 @@ class MeetingTracker:
                     screenshot = screen.grab(self.region.as_mss_region())
                     if timing is not None:
                         timing.mark("capture_end_s")
+                    if self._stop_event.is_set():
+                        if timing is not None: timing.finish("stopped")
+                        break
                     raw_frame = np.asarray(screenshot)
                     if raw_frame.ndim != 3 or raw_frame.shape[2] != 4:
                         raise ValueError("MSS returned an unexpected frame format")
@@ -190,6 +196,9 @@ class MeetingTracker:
                     results = landmarker.detect_for_video(image, timestamp_ms)
                     if timing is not None:
                         timing.mark("inference_end_s")
+                    if self._stop_event.is_set():
+                        if timing is not None: timing.finish("stopped")
+                        break
                     faces = results.face_landmarks or []
                     detected = bool(faces)
                     status = face_status_text(detected)

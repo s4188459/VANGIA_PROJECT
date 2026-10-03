@@ -50,6 +50,7 @@ class AppController:
         self._closed = False
         self._last_session_directory: Path | None = None
         self._final_job = None
+        self._quit_after_stop = False
         self._set_state(AppState.NO_REGION, "No region selected")
 
     def _set_state(self, state: AppState, status: str) -> None:
@@ -67,41 +68,51 @@ class AppController:
             return str(exc)
         return None
 
-    def _stop_worker(self, *, remove_empty_recording: bool = False) -> str | None:
+    def _stop_worker(self, *, remove_empty_recording: bool = False, on_complete=None) -> str | None:
         tracker = self._tracker
         recorder = self._recorder
         had_session = tracker is not None or recorder is not None or self._orchestrator is not None
-        errors = []
-        if tracker is not None:
-            try:
-                tracker.stop()
-            except Exception as exc:
-                errors.append(str(exc))
-        self._tracker = None
-        self._generation += 1
         orchestrator = self._orchestrator
-        self._orchestrator = None
-        if orchestrator is not None:
-            try:
-                stop_error = orchestrator.stop()
-                if stop_error:
-                    errors.append(str(stop_error))
-            except Exception as exc:
-                errors.append(str(exc))
-            finally:
-                self._recorder = None
-        else:
-            close_error = self._close_recorder(remove_if_empty=remove_empty_recording)
-            if close_error:
-                errors.append(close_error)
-        if recorder is not None and hasattr(recorder, "directory") and recorder.directory.is_dir():
-            self._last_session_directory = recorder.directory
+        if self._session_clock is not None and hasattr(self._session_clock, "stop"):
+            self._session_clock.stop()
+        if orchestrator is not None and hasattr(orchestrator, "request_stop"):
+            orchestrator.request_stop()
+        if tracker is not None and hasattr(tracker, "request_stop"):
+            tracker.request_stop()
+        # Hide immediately. File closure never calls Tk.
         self._hide_overlay()
         if had_session and hasattr(self.view, "hide_transcript_panel"):
             self.view.hide_transcript_panel()
         if had_session:
             self.view.clear_features()
-        return "; ".join(errors) or None
+
+        def cleanup():
+            errors = []
+            if tracker is not None:
+                try: tracker.stop()
+                except Exception as exc: errors.append(str(exc))
+            self._tracker = None
+            self._generation += 1
+            self._orchestrator = None
+            if orchestrator is not None:
+                try:
+                    error = orchestrator.stop()
+                    if error: errors.append(str(error))
+                except Exception as exc: errors.append(str(exc))
+                finally: self._recorder = None
+            else:
+                error = self._close_recorder(remove_if_empty=remove_empty_recording)
+                if error: errors.append(error)
+            if recorder is not None and hasattr(recorder, "directory") and recorder.directory.is_dir():
+                self._last_session_directory = recorder.directory
+            return "; ".join(errors) or None
+
+        if on_complete is not None and hasattr(self.view, "run_background"):
+            self.view.run_background(cleanup, on_complete)
+            return None
+        result = cleanup()
+        if on_complete is not None: on_complete(result)
+        return result
 
     def _hide_overlay(self) -> None:
         if not self._overlay_active:
@@ -110,7 +121,7 @@ class AppController:
         self.view.hide_overlay()
 
     def choose_save_folder(self) -> None:
-        if self.state in {AppState.RUNNING, AppState.PAUSED, AppState.SHUTTING_DOWN, AppState.FINALIZING}:
+        if self.state in {AppState.RUNNING, AppState.PAUSED, AppState.SHUTTING_DOWN, AppState.FINALIZING, AppState.STOPPING}:
             return
         selected = self.view.ask_save_folder()
         if not selected:
@@ -125,6 +136,12 @@ class AppController:
         self.view.show_save_folder(folder, name)
         if self.region is not None:
             self._set_state(AppState.READY, "Ready")
+
+    def _schedule_session(self, callback, generation):
+        def publish():
+            if generation == self._generation and self.state not in {AppState.STOPPING, AppState.SHUTTING_DOWN}:
+                callback()
+        self.view.schedule(publish)
 
     def _start_worker(self, *, paused: bool = False) -> None:
         if self.region is None or self.save_folder is None:
@@ -158,13 +175,13 @@ class AppController:
             if optional:
                 self._orchestrator = self._orchestrator_factory(
                     self._recorder, options, self.region, self._session_clock,
-                    transcript_callback=lambda segment: self.view.schedule(lambda: self.view.publish_transcript(segment)),
-                    status_callback=lambda status: self.view.schedule(lambda: self.view.publish_component_status(status)),
-                    transcript_metrics_callback=lambda metrics: self.view.schedule(
-                        lambda: self.view.publish_transcript_metrics(metrics)
+                    transcript_callback=lambda segment: self._schedule_session(lambda: self.view.publish_transcript(segment), generation),
+                    status_callback=lambda status: self._schedule_session(lambda: self.view.publish_component_status(status), generation),
+                    transcript_metrics_callback=lambda metrics: self._schedule_session(
+                        lambda: self.view.publish_transcript_metrics(metrics), generation
                     ) if hasattr(self.view, "publish_transcript_metrics") else None,
-                    audio_level_callback=lambda source, metrics: self.view.schedule(
-                        lambda: self.view.publish_audio_level(source, metrics)
+                    audio_level_callback=lambda source, metrics: self._schedule_session(
+                        lambda: self.view.publish_audio_level(source, metrics), generation
                     ) if hasattr(self.view, "publish_audio_level") else None,
                 )
                 self._orchestrator.start()
@@ -198,7 +215,7 @@ class AppController:
             self._set_state(AppState.RUNNING, "Running - Face not detected")
 
     def _publish_feature(self, frame, generation: int) -> None:
-        if generation != self._generation:
+        if generation != self._generation or self.state is AppState.STOPPING:
             return
         recorder = self._recorder
         if recorder is None:
@@ -216,7 +233,7 @@ class AppController:
             recorder.write_event(event)
 
     def select_region(self) -> None:
-        if self.state in {AppState.SHUTTING_DOWN, AppState.FINALIZING}:
+        if self.state in {AppState.SHUTTING_DOWN, AppState.FINALIZING, AppState.STOPPING}:
             return
         previous_region = self.region
         self._stop_worker()
@@ -252,9 +269,15 @@ class AppController:
     def stop(self) -> None:
         if self.state not in {AppState.RUNNING, AppState.PAUSED}:
             return
-        close_error = self._stop_worker()
+        self._set_state(AppState.STOPPING, "Stopped - saving files")
+        self._stop_worker(on_complete=self._stop_completed)
+
+    def _stop_completed(self, close_error) -> None:
         status = "Ready" if close_error is None else f"Ready - {close_error}"
         self._set_state(AppState.READY, status)
+        if self._quit_after_stop:
+            self.shutdown()
+            return
         if hasattr(self.view, "set_final_available"):
             available = bool(self._last_session_directory and
                              (self._last_session_directory / "audio.wav").is_file() and
@@ -322,7 +345,7 @@ class AppController:
         self.view.schedule(lambda: self._apply_tracker_event(event, event_generation))
 
     def _apply_tracker_event(self, event: TrackerEvent, generation: int) -> None:
-        if generation != self._generation or self.state is AppState.SHUTTING_DOWN:
+        if generation != self._generation or self.state in {AppState.SHUTTING_DOWN, AppState.STOPPING}:
             return
         if event.kind is TrackerEventKind.FACE_STATUS and self.state is AppState.RUNNING:
             self._set_state(AppState.RUNNING, f"Running - {event.message}")
@@ -350,6 +373,9 @@ class AppController:
             self.shutdown()
 
     def shutdown(self) -> None:
+        if self.state is AppState.STOPPING:
+            self._quit_after_stop = True
+            return
         if self._closed:
             return
         self._closed = True

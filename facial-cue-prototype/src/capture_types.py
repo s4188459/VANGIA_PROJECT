@@ -29,5 +29,6 @@ class AppState(Enum):
     READY = auto()
     RUNNING = auto()
     PAUSED = auto()
+    STOPPING = auto()
     FINALIZING = auto()
     SHUTTING_DOWN = auto()

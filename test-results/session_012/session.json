@@ -1,0 +1,582 @@
+{
+  "schema_version": "3.0",
+  "status": "incomplete",
+  "session_id": "session_012",
+  "participant_id": "Speaker",
+  "started_at_local": "2026-10-03T07:37:05.416642+07:00",
+  "ended_at_local": "2026-10-03T07:38:39.654564+07:00",
+  "duration_s": 94.23914300000001,
+  "region": {
+    "left": 1443,
+    "top": 285,
+    "width": 1405,
+    "height": 807
+  },
+  "options": {
+    "video": false,
+    "system_audio": true,
+    "microphone": false,
+    "transcript": true
+  },
+  "consent": {
+    "confirmed": true,
+    "confirmed_at_local": "2026-10-03T07:37:05.416642+07:00"
+  },
+  "components": {
+    "transcript": {
+      "state": "error",
+      "message": "Live transcription timed out on Stop; use final transcription for remaining audio"
+    },
+    "system_audio": {
+      "state": "stopped",
+      "message": ""
+    },
+    "audio": {
+      "state": "stopped",
+      "message": ""
+    },
+    "transcript_store": {
+      "state": "stopped",
+      "message": ""
+    }
+  },
+  "warnings": [],
+  "errors": [
+    {
+      "component": "transcript",
+      "message": "Live transcription timed out on Stop; use final transcription for remaining audio",
+      "timestamp_s": 94.10017500000004
+    }
+  ],
+  "drops": {},
+  "audio": {
+    "file": "audio.wav",
+    "sample_rate": 48000,
+    "channels": {
+      "left": "microphone/You",
+      "right": "system_audio/Student"
+    },
+    "packet_timing": "sample_count_with_pause_reanchor",
+    "devices": {
+      "system_audio": {
+        "name": "Speakers (Realtek(R) Audio) [Loopback]",
+        "sample_rate": 48000,
+        "channels": 2
+      }
+    },
+    "intervals": [
+      {
+        "session_start_s": 0.0,
+        "session_end_s": 84.07739319999996,
+        "wav_start_frame": 0,
+        "wav_end_frame": 4006692
+      }
+    ]
+  },
+  "transcription": {
+    "live": {
+      "model": "faster-whisper-small-en",
+      "device": "cpu",
+      "compute_type": "int8",
+      "cpu_threads": 4,
+      "num_workers": 1,
+      "beam_size": 5,
+      "language": "en",
+      "word_timestamps": true,
+      "vad_threshold": 0.35,
+      "utterance_pause_s": 1.0,
+      "temperature": 0.0,
+      "condition_on_previous_text": false,
+      "hallucination_silence_threshold": 1.0,
+      "segment_min_avg_logprob": -1.0,
+      "segment_max_compression_ratio": 2.4,
+      "overlap_deduplication": "timed_suffix_prefix_v1",
+      "window_s": 1.2,
+      "max_window_s": 12.0,
+      "endpoint_pause_s": 0.6,
+      "overlap_s": 0.75,
+      "queue_size": 4096
+    },
+    "final": {
+      "status": "not_started"
+    }
+  },
+  "observable_events": [
+    {
+      "start_time_s": 12.772,
+      "end_time_s": 13.282,
+      "action": "mouth_puckered",
+      "duration_s": 0.5099999999999998,
+      "peak_strength": 4.379600021153844,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 14.285,
+      "end_time_s": 14.771,
+      "action": "mouth_puckered",
+      "duration_s": 0.48600000000000065,
+      "peak_strength": 5.2417873338628045,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 11.906,
+      "end_time_s": 16.724,
+      "action": "mouth_movement_detected",
+      "duration_s": 4.818,
+      "peak_strength": 7.862681000794207,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 15.453,
+      "end_time_s": 20.045,
+      "action": "head_movement_detected",
+      "duration_s": 4.592000000000002,
+      "peak_strength": 5.565745326392522,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 20.117,
+      "end_time_s": 20.65,
+      "action": "smile_movement_detected",
+      "duration_s": 0.5329999999999977,
+      "peak_strength": 2.2290129214525223,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 19.405,
+      "end_time_s": 20.65,
+      "action": "nodding",
+      "duration_s": 1.2449999999999974,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 20.725,
+      "end_time_s": 21.322,
+      "action": "eyes_looking_left",
+      "duration_s": 0.5969999999999978,
+      "peak_strength": 2.6515969921213887,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 20.568,
+      "end_time_s": 22.16,
+      "action": "head_movement_detected",
+      "duration_s": 1.5919999999999987,
+      "peak_strength": 4.247024213917621,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 22.006,
+      "end_time_s": 22.634,
+      "action": "brows_lowered",
+      "duration_s": 0.6280000000000001,
+      "peak_strength": 1.3723928392088662,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 24.264,
+      "end_time_s": 24.715,
+      "action": "smile_movement_detected",
+      "duration_s": 0.4510000000000005,
+      "peak_strength": 2.414432391524315,
+      "status": "interrupted"
+    },
+    {
+      "start_time_s": 19.734,
+      "end_time_s": 24.715,
+      "action": "mouth_movement_detected",
+      "duration_s": 4.980999999999998,
+      "peak_strength": 4.572539838651816,
+      "status": "interrupted"
+    },
+    {
+      "start_time_s": 24.715,
+      "end_time_s": 24.97,
+      "action": "face_not_detected",
+      "duration_s": 0.254999999999999,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 25.749,
+      "end_time_s": 25.749,
+      "action": "face_detected_again",
+      "duration_s": 0.0,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 29.464,
+      "end_time_s": 29.56,
+      "action": "nodding",
+      "duration_s": 0.09600000000000009,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 30.089,
+      "end_time_s": 30.9,
+      "action": "asymmetric_brow_movement",
+      "duration_s": 0.8109999999999999,
+      "peak_strength": 1.476645055744383,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 40.089,
+      "end_time_s": 40.442,
+      "action": "nodding",
+      "duration_s": 0.35300000000000153,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 42.436,
+      "end_time_s": 42.827,
+      "action": "inner_brows_raised",
+      "duration_s": 0.39099999999999824,
+      "peak_strength": 2.6425762784977755,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 42.568,
+      "end_time_s": 43.202,
+      "action": "eyes_looking_down",
+      "duration_s": 0.6340000000000003,
+      "peak_strength": 1.593047653635343,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 42.436,
+      "end_time_s": 43.901,
+      "action": "nodding",
+      "duration_s": 1.4650000000000034,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 44.026,
+      "end_time_s": 44.493,
+      "action": "smile_movement_detected",
+      "duration_s": 0.46699999999999875,
+      "peak_strength": 2.2231891751289368,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 25.749,
+      "end_time_s": 44.493,
+      "action": "mouth_movement_detected",
+      "duration_s": 18.744000000000003,
+      "peak_strength": 6.653619904682273,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 41.552,
+      "end_time_s": 45.026,
+      "action": "head_movement_detected",
+      "duration_s": 3.4740000000000038,
+      "peak_strength": 6.854728931577588,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 48.241,
+      "end_time_s": 49.062,
+      "action": "smile_movement_detected",
+      "duration_s": 0.820999999999998,
+      "peak_strength": 2.0641477406024933,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 52.741,
+      "end_time_s": 54.302,
+      "action": "asymmetric_brow_movement",
+      "duration_s": 1.561,
+      "peak_strength": 1.66327017876837,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 55.092,
+      "end_time_s": 55.925,
+      "action": "nodding",
+      "duration_s": 0.8329999999999984,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 56.115,
+      "end_time_s": 56.622,
+      "action": "head_movement_detected",
+      "duration_s": 0.5069999999999979,
+      "peak_strength": 7.372374846513766,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 56.622,
+      "end_time_s": 57.285,
+      "action": "head_lowered",
+      "duration_s": 0.6629999999999967,
+      "peak_strength": 1.0844370716842227,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 57.285,
+      "end_time_s": 57.635,
+      "action": "nodding",
+      "duration_s": 0.3500000000000014,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 58.977,
+      "end_time_s": 60.177,
+      "action": "head_tilted_left",
+      "duration_s": 1.2000000000000028,
+      "peak_strength": 1.3170749284819576,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 59.65,
+      "end_time_s": 60.177,
+      "action": "mouth_puckered",
+      "duration_s": 0.527000000000001,
+      "peak_strength": 2.4574743207065493,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 59.959,
+      "end_time_s": 60.64,
+      "action": "head_movement_detected",
+      "duration_s": 0.6809999999999974,
+      "peak_strength": 3.102159993088482,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 60.429,
+      "end_time_s": 61.024,
+      "action": "jaw_opened",
+      "duration_s": 0.5949999999999989,
+      "peak_strength": 1.423234473913908,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 60.916,
+      "end_time_s": 61.643,
+      "action": "asymmetric_brow_movement",
+      "duration_s": 0.7270000000000039,
+      "peak_strength": 1.2271966371271346,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 62.244,
+      "end_time_s": 62.686,
+      "action": "head_movement_detected",
+      "duration_s": 0.44200000000000017,
+      "peak_strength": 2.314187044175029,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 46.561,
+      "end_time_s": 67.907,
+      "action": "mouth_movement_detected",
+      "duration_s": 21.345999999999997,
+      "peak_strength": 3.9476795122027397,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 68.816,
+      "end_time_s": 69.213,
+      "action": "smile_movement_detected",
+      "duration_s": 0.39699999999999136,
+      "peak_strength": 2.532389536499977,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 68.406,
+      "end_time_s": 70.507,
+      "action": "head_tilted_left",
+      "duration_s": 2.100999999999999,
+      "peak_strength": 1.8145228696086104,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 70.171,
+      "end_time_s": 70.714,
+      "action": "smile_movement_detected",
+      "duration_s": 0.5429999999999922,
+      "peak_strength": 2.6663678139448166,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 70.714,
+      "end_time_s": 70.874,
+      "action": "blinking",
+      "duration_s": 0.1599999999999966,
+      "peak_strength": 1.0430282354354858,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 70.714,
+      "end_time_s": 71.398,
+      "action": "mouth_puckered",
+      "duration_s": 0.6839999999999975,
+      "peak_strength": 4.025517966591805,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 71.472,
+      "end_time_s": 72.215,
+      "action": "smile_movement_detected",
+      "duration_s": 0.7430000000000092,
+      "peak_strength": 2.470485344529152,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 71.991,
+      "end_time_s": 72.546,
+      "action": "eyes_looking_left",
+      "duration_s": 0.5550000000000068,
+      "peak_strength": 1.7327548353932798,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 73.707,
+      "end_time_s": 74.495,
+      "action": "head_tilted_left",
+      "duration_s": 0.7880000000000109,
+      "peak_strength": 1.27066229543391,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 73.604,
+      "end_time_s": 74.917,
+      "action": "head_turned_left",
+      "duration_s": 1.3130000000000024,
+      "peak_strength": 1.0635414738407056,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 74.398,
+      "end_time_s": 74.917,
+      "action": "smile_movement_detected",
+      "duration_s": 0.5190000000000055,
+      "peak_strength": 1.3495593518018723,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 76.51,
+      "end_time_s": 77.146,
+      "action": "smile_movement_detected",
+      "duration_s": 0.6359999999999957,
+      "peak_strength": 2.4780484288930893,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 73.488,
+      "end_time_s": 77.485,
+      "action": "head_movement_detected",
+      "duration_s": 3.997,
+      "peak_strength": 4.397016944711031,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 76.51,
+      "end_time_s": 77.831,
+      "action": "brows_lowered",
+      "duration_s": 1.320999999999998,
+      "peak_strength": 2.3344233294483274,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 68.816,
+      "end_time_s": 78.7,
+      "action": "mouth_movement_detected",
+      "duration_s": 9.884,
+      "peak_strength": 6.038276949887708,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 79.131,
+      "end_time_s": 79.251,
+      "action": "nodding",
+      "duration_s": 0.12000000000000455,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 79.251,
+      "end_time_s": 81.766,
+      "action": "mouth_movement_detected",
+      "duration_s": 2.5150000000000006,
+      "peak_strength": 1.928222148368756,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 82.598,
+      "end_time_s": 83.567,
+      "action": "brows_lowered",
+      "duration_s": 0.9689999999999941,
+      "peak_strength": 1.4221813440478097,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 82.897,
+      "end_time_s": 83.958,
+      "action": "smile_movement_detected",
+      "duration_s": 1.0609999999999928,
+      "peak_strength": 2.564278021454811,
+      "status": "interrupted"
+    },
+    {
+      "start_time_s": 82.44,
+      "end_time_s": 83.958,
+      "action": "mouth_movement_detected",
+      "duration_s": 1.5180000000000007,
+      "peak_strength": 4.603692702949047,
+      "status": "interrupted"
+    }
+  ],
+  "media_stats": {
+    "audio": {
+      "sample_rate": 48000,
+      "written_frames": 4006692,
+      "intervals": [
+        {
+          "session_start_s": 0.0,
+          "session_end_s": 84.07739319999996,
+          "wav_start_frame": 0,
+          "wav_end_frame": 4006692
+        }
+      ],
+      "source_failures": []
+    }
+  },
+  "drop_details": [],
+  "runtime": {
+    "python": "3.12.14",
+    "packages": {
+      "mediapipe": "0.10.21",
+      "opencv-contrib-python": "4.11.0.86",
+      "faster-whisper": "1.2.1",
+      "ctranslate2": "4.8.2",
+      "mss": "10.2.0",
+      "numpy": "1.26.4",
+      "scipy": "1.17.1"
+    }
+  },
+  "interpretation_boundary": "Observable data only; no psychological or confusion inference.",
+  "landmark_timing": {
+    "file": "landmark-timing.csv",
+    "clock": "session_elapsed_monotonic_seconds",
+    "max_frames": 20000,
+    "recorded_frames": 784,
+    "omitted_frames": 0,
+    "finalized": true,
+    "outcomes": {
+      "rendered": 577,
+      "replaced": 206,
+      "not_rendered_at_close": 1
+    },
+    "invalid_order_frames": 0,
+    "render_boundary": "Tk canvas itemconfigure returned; not physical presentation"
+  }
+}

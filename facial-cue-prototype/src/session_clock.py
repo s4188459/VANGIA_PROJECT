@@ -10,6 +10,7 @@ class SessionClock:
         self._clock = clock
         self._origin: float | None = None
         self.started_at_local: str | None = None
+        self._stopped_elapsed: float | None = None
 
     def start(self) -> None:
         if self._origin is not None:
@@ -20,4 +21,9 @@ class SessionClock:
     def elapsed_s(self) -> float:
         if self._origin is None:
             raise RuntimeError("Session clock has not started")
+        if self._stopped_elapsed is not None:
+            return self._stopped_elapsed
         return max(0.0, self._clock() - self._origin)
+
+    def stop(self) -> None:
+        self._stopped_elapsed = self.elapsed_s()
