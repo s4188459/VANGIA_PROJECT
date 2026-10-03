@@ -24,6 +24,7 @@ from .action_types import ActionEvent, ActionMode
 from .capture_types import CaptureRegion
 from .face_landmarker import create_face_landmarker
 from .feature_data import FeatureFrame, extract_feature_frame
+from .frame_processing import prepare_capture_frame
 from .overlay_data import OverlayFrame, landmarks_to_pixels
 from .video_recorder import CapturedVideoFrame
 
@@ -161,7 +162,7 @@ class MeetingTracker:
                     if raw_frame.ndim != 3 or raw_frame.shape[2] != 4:
                         raise ValueError("MSS returned an unexpected frame format")
 
-                    rgb_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGRA2RGB)
+                    rgb_frame, bgr_frame = prepare_capture_frame(raw_frame, include_bgr=self._frame_callback is not None)
                     if timing is not None:
                         timing.mark("conversion_end_s")
                     elapsed_s = (self._clock() - session_start) if self._session_clock is None else self._session_clock.elapsed_s()
@@ -178,7 +179,6 @@ class MeetingTracker:
                     previous_timestamp_ms = timestamp_ms
                     video_frame_index = None
                     if self._frame_callback is not None:
-                        bgr_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGRA2BGR)
                         video_frame_index = self._frame_callback(CapturedVideoFrame(frame_index, timestamp_ms / 1000.0, bgr_frame.copy()))
 
                     image = mp.Image(

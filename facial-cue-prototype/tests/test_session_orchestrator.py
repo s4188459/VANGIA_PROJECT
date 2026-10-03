@@ -144,7 +144,8 @@ class SessionOrchestratorTests(unittest.TestCase):
 
         self.assertEqual(created["window_s"], 1.2)
         self.assertEqual(created["overlap_s"], 0.75)
-        self.assertEqual(created["max_window_s"], 12.0)
+        self.assertEqual(created["max_window_s"], 8.0)
+        self.assertEqual(created["speech_boundary"].keywords["pause_s"], .6)
         self.assertTrue(callable(created["speech_boundary"]))
 
     def test_transcription_metrics_callback_reaches_worker(self):

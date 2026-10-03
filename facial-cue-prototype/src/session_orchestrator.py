@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from functools import partial
 from dataclasses import asdict, is_dataclass
 
 from .audio_devices import discover_default_devices, open_input_stream
@@ -8,7 +9,7 @@ from .audio_quality import analyze_level
 from .audio_recorder import AudioCaptureWorker, AudioSource
 from .session_types import ComponentState, ComponentStatus
 from .stereo_audio import StereoAudioWriter
-from .transcription import LocalEnglishTranscriber, TranscriptionWorker, speech_has_ended
+from .transcription import LocalEnglishTranscriber, TranscriptionWorker, speech_has_ended, LIVE_ENDPOINT_PAUSE_S, LIVE_MAX_WINDOW_S
 from .transcript_writer import TranscriptStore
 from .video_recorder import VideoRecorder
 
@@ -74,7 +75,7 @@ class SessionOrchestrator:
                 transcriber = self._transcriber_factory(model)
                 self.dataset.set_transcription_metadata({"live": {
                     **getattr(transcriber, "configuration", {"model": model.name}),
-                    "window_s": 1.2, "max_window_s": 12.0, "overlap_s": .75, "queue_size": 4096,
+                    "window_s": 1.2, "max_window_s": LIVE_MAX_WINDOW_S, "endpoint_pause_s": LIVE_ENDPOINT_PAUSE_S, "overlap_s": .75, "queue_size": 4096,
                 }})
                 def publish(segment):
                     self._transcript_writer.append_live(segment); self._transcript_callback(segment)
@@ -82,8 +83,8 @@ class SessionOrchestrator:
                     transcriber,
                     publish,
                     window_s=1.2,
-                    max_window_s=12.0,
-                    speech_boundary=speech_has_ended,
+                    max_window_s=LIVE_MAX_WINDOW_S,
+                    speech_boundary=partial(speech_has_ended, pause_s=LIVE_ENDPOINT_PAUSE_S),
                     overlap_s=0.75,
                     clock=self.clock.elapsed_s,
                     metrics_callback=self._transcript_metrics_callback,

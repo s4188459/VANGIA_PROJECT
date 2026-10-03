@@ -6,6 +6,14 @@ import numpy as np
 from .app_utils import format_fps
 
 
+def prepare_capture_frame(raw_frame: np.ndarray, *, include_bgr: bool = False):
+    if raw_frame.ndim != 3 or raw_frame.shape[2] != 4:
+        raise ValueError("MSS returned an unexpected frame format")
+    rgb = cv2.cvtColor(raw_frame, cv2.COLOR_BGRA2RGB)
+    bgr = cv2.cvtColor(raw_frame, cv2.COLOR_BGRA2BGR) if include_bgr else None
+    return rgb, bgr
+
+
 def prepare_frames(bgr_frame: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     preview = bgr_frame.copy()
     rgb = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)

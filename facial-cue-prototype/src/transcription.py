@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import math
+import re
+from types import SimpleNamespace
 from pathlib import Path
 import queue
 import threading
@@ -19,6 +21,8 @@ class TranscriptionUnavailable(RuntimeError): pass
 
 UTTERANCE_PAUSE_S = 1.0
 ENDPOINT_CHECK_S = 0.1
+LIVE_ENDPOINT_PAUSE_S = 0.6
+LIVE_MAX_WINDOW_S = 8.0
 
 
 @dataclass(frozen=True)
@@ -43,19 +47,19 @@ class TranscriptionMetrics:
     queued_duration_s: dict[str, float] = field(default_factory=dict)
 
 
-def speech_has_ended(samples: np.ndarray, sample_rate: int) -> bool:
+def speech_has_ended(samples: np.ndarray, sample_rate: int, *, pause_s: float = UTTERANCE_PAUSE_S) -> bool:
     from faster_whisper.vad import VadOptions, get_speech_timestamps
 
     # Endpoint detection needs recent speech context, not the whole utterance.
-    samples = samples[-round(sample_rate * (UTTERANCE_PAUSE_S + 1.0)):]
+    samples = samples[-round(sample_rate * (pause_s + 1.0)):]
     if sample_rate != 16000:
         divisor = math.gcd(sample_rate, 16000)
         samples = resample_poly(samples, 16000 // divisor, sample_rate // divisor).astype(np.float32)
     audio, _gain = prepare_inference_audio(samples)
     spans = get_speech_timestamps(
-        audio, VadOptions(threshold=0.35, min_silence_duration_ms=round(UTTERANCE_PAUSE_S * 1000), speech_pad_ms=0),
+        audio, VadOptions(threshold=0.35, min_silence_duration_ms=round(pause_s * 1000), speech_pad_ms=0),
     )
-    return not spans or len(audio) - spans[-1]["end"] >= round(16000 * UTTERANCE_PAUSE_S)
+    return not spans or len(audio) - spans[-1]["end"] >= round(16000 * pause_s)
 
 
 def pause_grouped_segments(segments):
@@ -98,11 +102,17 @@ class LocalEnglishTranscriber:
                 num_workers=1,
             )
         self._model = model; self._next_id = 1; self._beam_size = beam_size; self._phase = phase
+        self._word_history = {}
+        self.rejected_segments = 0
         self.configuration = {
             "model": Path(model_path).name, "device": "cpu", "compute_type": "int8",
             "cpu_threads": cpu_threads, "num_workers": 1, "beam_size": beam_size,
             "language": "en", "word_timestamps": True, "vad_threshold": .35,
             "utterance_pause_s": UTTERANCE_PAUSE_S,
+            "temperature": 0.0, "condition_on_previous_text": False,
+            "hallucination_silence_threshold": 1.0,
+            "segment_min_avg_logprob": -1.0, "segment_max_compression_ratio": 2.4,
+            "overlap_deduplication": "timed_suffix_prefix_v1",
         }
 
     def transcribe(self, chunk: AudioChunk) -> tuple[TranscriptSegment, ...]:
@@ -116,9 +126,14 @@ class LocalEnglishTranscriber:
             vad_parameters={"threshold": 0.35, "min_silence_duration_ms": round(UTTERANCE_PAUSE_S * 1000)},
             word_timestamps=True,
             beam_size=self._beam_size,
+            temperature=0.0, condition_on_previous_text=False,
+            hallucination_silence_threshold=1.0,
         )
         output = []
         speaker = "Student" if chunk.source is AudioSource.SYSTEM_AUDIO else "You"
+        segments = self._accepted_segments(segments)
+        if self._phase == "live":
+            segments = self._deduplicate_overlap(segments, chunk)
         for start, end, value in pause_grouped_segments(segments):
             if not value: continue
             status = "canonical" if self._phase == "final" else "committed"
@@ -126,6 +141,45 @@ class LocalEnglishTranscriber:
                                             chunk.source, speaker, value, phase=self._phase, status=status))
             self._next_id += 1
         return tuple(output)
+
+
+    def _accepted_segments(self, segments):
+        for segment in segments:
+            logprob = getattr(segment, "avg_logprob", None)
+            ratio = getattr(segment, "compression_ratio", None)
+            if ((logprob is not None and (not math.isfinite(logprob) or logprob < -1.0))
+                    or (ratio is not None and (not math.isfinite(ratio) or ratio > 2.4))):
+                self.rejected_segments += 1
+                continue
+            yield segment
+
+    def _deduplicate_overlap(self, segments, chunk):
+        segments = list(segments)
+        # Missing word timestamps cannot safely support word-level trimming.
+        if any(not getattr(segment, "words", None) for segment in segments):
+            self._word_history.pop(chunk.source, None)
+            return segments
+        words = [w for segment in segments for w in segment.words if w.word.strip()]
+        previous_end, previous = self._word_history.get(chunk.source, (float("-inf"), []))
+        def key(text):
+            return " ".join(re.findall(r"[a-z]+(?:'[a-z]+)?", text.lower()))
+        current = [(chunk.start_s+w.start, chunk.start_s+w.end, key(w.word)) for w in words]
+        trim = 0
+        if chunk.start_s < previous_end:
+            # Match only the published suffix to the new prefix at the same audio time.
+            # Midpoint tolerance allows modest Whisper alignment jitter, not later repeats.
+            for count in range(min(len(previous), len(current)), 0, -1):
+                left, right = previous[-count:], current[:count]
+                if all(a[2] and a[2] == b[2]
+                       and abs((a[0]+a[1]-b[0]-b[1])/2) <= .35
+                       and a[1] >= chunk.start_s-.35 and b[0] < previous_end
+                       for a,b in zip(left,right)):
+                    trim = count
+                    break
+        retained = words[trim:]
+        history = (previous if chunk.start_s < previous_end else []) + current[trim:]
+        self._word_history[chunk.source] = (chunk.end_s, history[-64:])
+        return [SimpleNamespace(words=retained)] if retained else []
 
 
 @dataclass
