@@ -1,0 +1,225 @@
+{
+  "session_id": "session_011",
+  "report_created_on": "2026-10-07",
+  "purpose": "Retrospective per-session configuration record; not an executable app configuration.",
+  "source_manifest": "session.json",
+  "source_manifest_sha256": "1c879d55f582bcfb20234d9d87af187750912c9d789f400bc91acd7ed7f7bd5d",
+  "capture_started_at": "2026-10-02T19:13:55.476587+07:00",
+  "evidence_policy": "Recorded fields are copied from this session manifest. Null or absent parameters are not reconstructed from current source. Recorded-value differences do not alone prove a code change.",
+  "recorded_configuration": {
+    "options": {
+      "video": false,
+      "system_audio": true,
+      "microphone": false,
+      "transcript": true
+    },
+    "capture_region": {
+      "left": 1443,
+      "top": 288,
+      "width": 1404,
+      "height": 804
+    },
+    "runtime": {
+      "python": "3.12.14",
+      "packages": {
+        "mediapipe": "0.10.21",
+        "opencv-contrib-python": "4.11.0.86",
+        "faster-whisper": "1.2.1",
+        "ctranslate2": "4.8.2",
+        "mss": "10.2.0",
+        "numpy": "1.26.4",
+        "scipy": "1.17.1"
+      }
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": {
+        "left": "microphone/You",
+        "right": "system_audio/Student"
+      },
+      "packet_timing": "sample_count_with_pause_reanchor",
+      "devices": {
+        "system_audio": {
+          "name": "Speakers (Realtek(R) Audio) [Loopback]",
+          "sample_rate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    "live_transcription": {
+      "model": "faster-whisper-small-en",
+      "device": "cpu",
+      "compute_type": "int8",
+      "cpu_threads": 4,
+      "num_workers": 1,
+      "beam_size": 5,
+      "language": "en",
+      "word_timestamps": true,
+      "vad_threshold": 0.35,
+      "utterance_pause_s": 1.0,
+      "window_s": 1.2,
+      "max_window_s": 12.0,
+      "overlap_s": 0.75,
+      "queue_size": 4096
+    },
+    "final_transcription": {
+      "status": "not_started"
+    },
+    "video": {
+      "codec": null,
+      "fps": null
+    },
+    "timing_instrumentation": {
+      "file": "landmark-timing.csv",
+      "clock": "session_elapsed_monotonic_seconds",
+      "max_frames": 20000,
+      "render_boundary": "Tk canvas itemconfigure returned; not physical presentation"
+    }
+  },
+  "observed_wav_format": {
+    "sample_rate_hz": 48000,
+    "channels": 2,
+    "sample_width_bytes": 2,
+    "frames": 3335647,
+    "duration_s": 69.49264583333333
+  },
+  "documented_context": {
+    "changes_before_this_session": "Transcript false -> true at the same 1404 x 804 region. Recorded model small.en, CPU INT8, four threads, beam five; original 1.0 s endpoint policy.",
+    "changes_after_this_session_not_applied_to_recorded_config": "Added timed suffix/prefix dedup v1 and reduced LIVE endpoint pause to 0.6 s. Restored explicit decoder/quality guards and prepare_capture_frame helper. Tested 6/8 s windows offline, rejected them for extra fragments/repetition, retained 12 s. These changes occurred AFTER 011.",
+    "common_face_baseline": {
+      "evidence": "../../local-document-backup/notion-test-log.en.md and dated reviews; historical baseline, not a per-session parameter snapshot",
+      "model": "face_landmarker.task",
+      "mode": "VIDEO",
+      "maximum_faces": 1,
+      "detection_presence_tracking_thresholds": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "baseline_duration_s": 2.0,
+      "baseline_min_samples": 30,
+      "smoothing_window_s": 0.25,
+      "typical_action_hold_s": 0.25,
+      "release_s": 0.15,
+      "cooldown_s": 0.3,
+      "per_session_values_independently_recorded": false
+    }
+  },
+  "changes_from_previous_session": [
+    {
+      "field": "live_transcription.beam_size",
+      "previous": null,
+      "current": 5,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.compute_type",
+      "previous": null,
+      "current": "int8",
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.cpu_threads",
+      "previous": null,
+      "current": 4,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.device",
+      "previous": null,
+      "current": "cpu",
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.language",
+      "previous": null,
+      "current": "en",
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.max_window_s",
+      "previous": null,
+      "current": 12.0,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.model",
+      "previous": null,
+      "current": "faster-whisper-small-en",
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.num_workers",
+      "previous": null,
+      "current": 1,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.overlap_s",
+      "previous": null,
+      "current": 0.75,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.queue_size",
+      "previous": null,
+      "current": 4096,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.utterance_pause_s",
+      "previous": null,
+      "current": 1.0,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.vad_threshold",
+      "previous": null,
+      "current": 0.35,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.window_s",
+      "previous": null,
+      "current": 1.2,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "live_transcription.word_timestamps",
+      "previous": null,
+      "current": true,
+      "previous_field_recorded": false,
+      "current_field_recorded": true
+    },
+    {
+      "field": "options.transcript",
+      "previous": false,
+      "current": true,
+      "previous_field_recorded": true,
+      "current_field_recorded": true
+    }
+  ],
+  "unknown_at_capture": [
+    "Complete source commit and uncommitted diff",
+    "Complete model artifact hashes",
+    "CPU model, RAM, operating-system build and concurrent workload",
+    "Face/action parameters are not independently snapshotted in this manifest"
+  ],
+  "supporting_documents": [
+    "change-log.md",
+    "../sessions-010-011-corrected-review.md"
+  ]
+}

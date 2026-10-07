@@ -1,0 +1,90 @@
+{
+  "scope": "Offline replay of two previously transcribed windows; no UI or hardware capture.",
+  "comparison": "Historical saved text; pre-change replay also reproduced both texts during investigation.",
+  "configuration": {
+    "model": "faster-whisper-small-en",
+    "device": "cpu",
+    "compute_type": "int8",
+    "cpu_threads": 4,
+    "num_workers": 1,
+    "beam_size": 5,
+    "language": "en",
+    "word_timestamps": true,
+    "vad_threshold": 0.35,
+    "utterance_pause_s": 1.0,
+    "temperature": 0.0,
+    "condition_on_previous_text": false,
+    "hallucination_silence_threshold": 1.0,
+    "segment_min_avg_logprob": -1.0,
+    "segment_max_compression_ratio": 2.4,
+    "overlap_deduplication": "timed_suffix_prefix_v2"
+  },
+  "raw_sha256": {
+    "audio.wav": "b9781db94ac002c2bae1879ebbe06eb5ade3860150c30d83b7660eb08e12dced",
+    "features.csv": "819d979be7a79fc799daab287638e165de36a227a1ffbc9c24825aca2db98193",
+    "landmark-timing.csv": "40daaac027bef54208cfe2de5a82f7a2a759e012c2971b9ff15957358ce4f319",
+    "session.json": "b1c6ae44bab81c17bb85839105311ea5a27457042e1ada516fd4d0c49ba45056",
+    "transcript.jsonl": "142f2d119a654fd20c9058cd351f33c749aea2f0e106cae8e7e0036bc298cb8b"
+  },
+  "windows": [
+    {
+      "start_s": 17.361913333333035,
+      "end_s": 29.361913333333035,
+      "decode_wall_s": 5.965392400000383,
+      "historical_text": "So, let's go over what it's gonna look like. I have prepared a dialogue. One line is for me and the other one is for you. You will see them on the screen. I'm gonna say my line and you are gonna read your.",
+      "replayed_segments": [
+        {
+          "segment_id": 1,
+          "start_s": 17.361913333333035,
+          "end_s": 29.241913333333038,
+          "source": "system_audio",
+          "speaker": "Student",
+          "text": "So, let's go over what it's gonna look like. I have prepared a dialogue. One line is for me and the other one is for you. You will see them on the screen. I'm gonna say my line and you are gonna read your.",
+          "language": "en",
+          "phase": "live",
+          "status": "committed"
+        }
+      ]
+    },
+    {
+      "start_s": 28.611913333333035,
+      "end_s": 40.611913333333035,
+      "decode_wall_s": 5.04829669999981,
+      "historical_text": "to read your line out loud on the screen and that's going to be your response and then vice versa. The first line will be yours and the second line. This exercise will give you already ready lines in",
+      "replayed_segments": [
+        {
+          "segment_id": 2,
+          "start_s": 29.231913333333036,
+          "end_s": 40.471913333333035,
+          "source": "system_audio",
+          "speaker": "Student",
+          "text": "line out loud on the screen and that's going to be your response and then vice versa. The first line will be yours and the second line. This exercise will give you already ready lines in",
+          "language": "en",
+          "phase": "live",
+          "status": "committed"
+        }
+      ]
+    }
+  ],
+  "serialization_benchmark": {
+    "full_buffer": {
+      "samples": 576000,
+      "audio_bytes": 2304000,
+      "serialized_bytes": 2304189,
+      "mean_ms": 1.9838684999967882,
+      "p95_ms": 2.45177999927364
+    },
+    "bounded_context": {
+      "samples": 76800,
+      "audio_bytes": 307200,
+      "serialized_bytes": 307389,
+      "mean_ms": 0.04270800000995223,
+      "p95_ms": 0.06551000033141463
+    }
+  },
+  "limitations": [
+    "No WER without a verified reference.",
+    "Serialization timing excludes process transport, VAD, UI and concurrent face tracking.",
+    "Boundary heuristic is conservative, not a guarantee against all repetition."
+  ]
+}

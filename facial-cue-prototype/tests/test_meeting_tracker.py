@@ -285,26 +285,32 @@ class MeetingTrackerTests(unittest.TestCase):
 
     def test_pause_produces_no_rows_and_resume_keeps_elapsed_gap(self):
         screen = FakeScreen()
-        tracker = self.make_tracker(screen, FakeLandmarker())
+        now = [0.0]
+        tracker = self.make_tracker(screen, FakeLandmarker(), clock=lambda: now[0])
+        # Fast fake capture can advance monotonic task timestamps ahead of real
+        # time. Control both the clock and frame count instead of timing sleep().
+        def publish(frame):
+            self.feature_frames.append(frame)
+            if len(self.feature_frames) == 1:
+                tracker.pause()
+            else:
+                tracker.request_stop()
+        tracker._feature_callback = publish
         tracker.start()
-        self.assertTrue(wait_until(lambda: bool(self.feature_frames)))
-
-        tracker.pause()
-        self.assertTrue(wait_until(lambda: any(frame.paused for frame in self.overlay_frames)))
-        paused_grabs = len(screen.grab_regions)
-        paused_rows = len(self.feature_frames)
-        before_pause_timestamp = self.feature_frames[-1].timestamp_s
-        time.sleep(0.04)
-
-        self.assertEqual(len(screen.grab_regions), paused_grabs)
-        self.assertEqual(len(self.feature_frames), paused_rows)
-        tracker.resume()
-        self.assertTrue(wait_until(lambda: len(self.feature_frames) > paused_rows))
-        self.assertGreaterEqual(
-            self.feature_frames[-1].timestamp_s - before_pause_timestamp,
-            0.03,
-        )
-        tracker.stop()
+        try:
+            self.assertTrue(wait_until(lambda: any(frame.paused for frame in self.overlay_frames)))
+            paused_grabs = len(screen.grab_regions)
+            paused_rows = len(self.feature_frames)
+            before_pause_timestamp = self.feature_frames[-1].timestamp_s
+            now[0] = 5.0
+            time.sleep(0.02)  # Allow paused worker iterations; not a timestamp measurement.
+            self.assertEqual(len(screen.grab_regions), paused_grabs)
+            self.assertEqual(len(self.feature_frames), paused_rows)
+            tracker.resume()
+            self.assertTrue(wait_until(lambda: len(self.feature_frames) > paused_rows))
+            self.assertAlmostEqual(self.feature_frames[-1].timestamp_s - before_pause_timestamp, 5.0)
+        finally:
+            tracker.stop()
 
     def test_callback_error_is_reported_and_worker_stops(self):
         def fail(_frame):

@@ -1,0 +1,133 @@
+{
+  "session_id": "session_007",
+  "report_created_on": "2026-10-07",
+  "purpose": "Retrospective per-session configuration record; not an executable app configuration.",
+  "source_manifest": "session.json",
+  "source_manifest_sha256": "263c9b6ce770110f061e0e32a5373a04ea8fb936119e61e2ba51c4cf3c2f264f",
+  "capture_started_at": "2026-10-01T22:00:10.762347+07:00",
+  "evidence_policy": "Recorded fields are copied from this session manifest. Null or absent parameters are not reconstructed from current source. Recorded-value differences do not alone prove a code change.",
+  "recorded_configuration": {
+    "options": {
+      "video": false,
+      "system_audio": true,
+      "microphone": false,
+      "transcript": false
+    },
+    "capture_region": {
+      "left": 1443,
+      "top": 286,
+      "width": 1403,
+      "height": 807
+    },
+    "runtime": {
+      "python": "3.12.14",
+      "packages": {
+        "mediapipe": "0.10.21",
+        "opencv-contrib-python": "4.11.0.86",
+        "faster-whisper": "1.2.1",
+        "ctranslate2": "4.8.2",
+        "mss": "10.2.0",
+        "numpy": "1.26.4",
+        "scipy": "1.17.1"
+      }
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": {
+        "left": "microphone/You",
+        "right": "system_audio/Student"
+      },
+      "packet_timing": "sample_count_with_pause_reanchor",
+      "devices": {
+        "system_audio": {
+          "name": "Speakers (Realtek(R) Audio) [Loopback]",
+          "sample_rate": 48000,
+          "channels": 2
+        }
+      }
+    },
+    "live_transcription": {},
+    "final_transcription": {
+      "status": "not_started"
+    },
+    "video": {
+      "codec": null,
+      "fps": null
+    },
+    "timing_instrumentation": {
+      "file": null,
+      "clock": null,
+      "max_frames": null,
+      "render_boundary": null
+    }
+  },
+  "observed_wav_format": {
+    "sample_rate_hz": 48000,
+    "channels": 2,
+    "sample_width_bytes": 2,
+    "frames": 4335308,
+    "duration_s": 90.31891666666667
+  },
+  "documented_context": {
+    "changes_before_this_session": "Region reduced to 1403 x 807; audio configuration retained. No documented source change for this comparison.",
+    "changes_after_this_session_not_applied_to_recorded_config": "Add shared-clock per-frame stage instrumentation to distinguish processing, waiting and rendering. This is diagnostic work after the run.",
+    "common_face_baseline": {
+      "evidence": "../../local-document-backup/notion-test-log.en.md and dated reviews; historical baseline, not a per-session parameter snapshot",
+      "model": "face_landmarker.task",
+      "mode": "VIDEO",
+      "maximum_faces": 1,
+      "detection_presence_tracking_thresholds": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "baseline_duration_s": 2.0,
+      "baseline_min_samples": 30,
+      "smoothing_window_s": 0.25,
+      "typical_action_hold_s": 0.25,
+      "release_s": 0.15,
+      "cooldown_s": 0.3,
+      "per_session_values_independently_recorded": false
+    }
+  },
+  "changes_from_previous_session": [
+    {
+      "field": "capture_region.height",
+      "previous": 1054,
+      "current": 807,
+      "previous_field_recorded": true,
+      "current_field_recorded": true
+    },
+    {
+      "field": "capture_region.left",
+      "previous": 999,
+      "current": 1443,
+      "previous_field_recorded": true,
+      "current_field_recorded": true
+    },
+    {
+      "field": "capture_region.top",
+      "previous": 289,
+      "current": 286,
+      "previous_field_recorded": true,
+      "current_field_recorded": true
+    },
+    {
+      "field": "capture_region.width",
+      "previous": 1850,
+      "current": 1403,
+      "previous_field_recorded": true,
+      "current_field_recorded": true
+    }
+  ],
+  "unknown_at_capture": [
+    "Complete source commit and uncommitted diff",
+    "Complete model artifact hashes",
+    "CPU model, RAM, operating-system build and concurrent workload",
+    "Face/action parameters are not independently snapshotted in this manifest"
+  ],
+  "supporting_documents": [
+    "manual-review.md",
+    "technical-review.md"
+  ]
+}

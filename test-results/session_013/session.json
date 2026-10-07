@@ -1,0 +1,338 @@
+{
+  "schema_version": "3.0",
+  "status": "closed",
+  "session_id": "session_013",
+  "participant_id": "Speaker",
+  "started_at_local": "2026-10-06T20:49:00.800510+07:00",
+  "ended_at_local": "2026-10-06T20:49:49.808326+07:00",
+  "duration_s": 48.94894850000037,
+  "region": {
+    "left": 1443,
+    "top": 297,
+    "width": 1407,
+    "height": 791
+  },
+  "options": {
+    "video": false,
+    "system_audio": true,
+    "microphone": false,
+    "transcript": false
+  },
+  "consent": {
+    "confirmed": true,
+    "confirmed_at_local": "2026-10-06T20:49:00.800510+07:00"
+  },
+  "components": {
+    "system_audio": {
+      "state": "stopped",
+      "message": ""
+    },
+    "audio": {
+      "state": "stopped",
+      "message": ""
+    }
+  },
+  "warnings": [],
+  "errors": [],
+  "drops": {},
+  "audio": {
+    "file": "audio.wav",
+    "sample_rate": 48000,
+    "channels": {
+      "left": "microphone/You",
+      "right": "system_audio/Student"
+    },
+    "packet_timing": "sample_count_with_pause_reanchor",
+    "devices": {
+      "system_audio": {
+        "name": "Speakers (Realtek(R) Audio) [Loopback]",
+        "sample_rate": 48000,
+        "channels": 2
+      }
+    },
+    "intervals": [
+      {
+        "session_start_s": 0.0,
+        "session_end_s": 48.94894850000037,
+        "wav_start_frame": 0,
+        "wav_end_frame": 2347770
+      }
+    ]
+  },
+  "transcription": {
+    "live": {},
+    "final": {
+      "status": "not_started"
+    }
+  },
+  "observable_events": [
+    {
+      "start_time_s": 0.48,
+      "end_time_s": 0.694,
+      "action": "face_not_detected",
+      "duration_s": 0.21399999999999997,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 1.751,
+      "end_time_s": 1.751,
+      "action": "face_detected_again",
+      "duration_s": 0.0,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 5.111,
+      "end_time_s": 5.562,
+      "action": "mouth_puckered",
+      "duration_s": 0.4510000000000005,
+      "peak_strength": 4.750560802252343,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 6.575,
+      "end_time_s": 7.038,
+      "action": "mouth_puckered",
+      "duration_s": 0.4630000000000001,
+      "peak_strength": 5.364792627127221,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 5.562,
+      "end_time_s": 8.619,
+      "action": "asymmetric_brow_movement",
+      "duration_s": 3.0569999999999995,
+      "peak_strength": 1.544559146795008,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 7.686,
+      "end_time_s": 10.895,
+      "action": "head_movement_detected",
+      "duration_s": 3.2089999999999996,
+      "peak_strength": 5.59969675093642,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 11.702,
+      "end_time_s": 12.982,
+      "action": "nodding",
+      "duration_s": 1.2799999999999994,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 12.982,
+      "end_time_s": 13.515,
+      "action": "eyes_looking_left",
+      "duration_s": 0.5330000000000013,
+      "peak_strength": 2.6558170064042015,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 14.364,
+      "end_time_s": 14.893,
+      "action": "brows_lowered",
+      "duration_s": 0.5289999999999999,
+      "peak_strength": 1.2327450358619294,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 13.34,
+      "end_time_s": 15.34,
+      "action": "head_movement_detected",
+      "duration_s": 2.0,
+      "peak_strength": 5.373746393744213,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 3.946,
+      "end_time_s": 16.987,
+      "action": "mouth_movement_detected",
+      "duration_s": 13.040999999999999,
+      "peak_strength": 8.04718894069083,
+      "status": "interrupted"
+    },
+    {
+      "start_time_s": 16.987,
+      "end_time_s": 17.203,
+      "action": "face_not_detected",
+      "duration_s": 0.21600000000000108,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 17.975,
+      "end_time_s": 17.975,
+      "action": "face_detected_again",
+      "duration_s": 0.0,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 21.615,
+      "end_time_s": 22.418,
+      "action": "jaw_opened",
+      "duration_s": 0.8030000000000008,
+      "peak_strength": 1.6528643015772104,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 21.325,
+      "end_time_s": 23.22,
+      "action": "asymmetric_brow_movement",
+      "duration_s": 1.8949999999999996,
+      "peak_strength": 1.601968001988199,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 25.417,
+      "end_time_s": 26.25,
+      "action": "head_lowered",
+      "duration_s": 0.8329999999999984,
+      "peak_strength": 1.304111313325918,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 29.637,
+      "end_time_s": 29.993,
+      "action": "mouth_puckered",
+      "duration_s": 0.3559999999999981,
+      "peak_strength": 4.404815285104431,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 30.217,
+      "end_time_s": 34.737,
+      "action": "asymmetric_brow_movement",
+      "duration_s": 4.520000000000003,
+      "peak_strength": 1.2547432962391112,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 34.737,
+      "end_time_s": 35.318,
+      "action": "eyes_looking_down",
+      "duration_s": 0.580999999999996,
+      "peak_strength": 1.6130476693312328,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 34.083,
+      "end_time_s": 36.273,
+      "action": "nodding",
+      "duration_s": 2.190000000000005,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 34.564,
+      "end_time_s": 36.582,
+      "action": "head_movement_detected",
+      "duration_s": 2.0180000000000007,
+      "peak_strength": 9.736065763578353,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 39.314,
+      "end_time_s": 39.615,
+      "action": "jaw_opened",
+      "duration_s": 0.30100000000000193,
+      "peak_strength": 1.853057974949479,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 42.216,
+      "end_time_s": 42.697,
+      "action": "eyes_looking_right",
+      "duration_s": 0.48100000000000165,
+      "peak_strength": 1.1729468615944547,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 46.905,
+      "end_time_s": 47.264,
+      "action": "eyes_looking_down",
+      "duration_s": 0.35900000000000176,
+      "peak_strength": 1.328407128651937,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 44.95,
+      "end_time_s": 47.674,
+      "action": "asymmetric_brow_movement",
+      "duration_s": 2.7239999999999966,
+      "peak_strength": 1.5658553689718246,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 46.358,
+      "end_time_s": 48.287,
+      "action": "nodding",
+      "duration_s": 1.929000000000002,
+      "peak_strength": 1.0,
+      "status": "completed"
+    },
+    {
+      "start_time_s": 17.975,
+      "end_time_s": 48.892,
+      "action": "mouth_movement_detected",
+      "duration_s": 30.917,
+      "peak_strength": 8.044026417580124,
+      "status": "interrupted"
+    },
+    {
+      "start_time_s": 47.171,
+      "end_time_s": 48.892,
+      "action": "head_movement_detected",
+      "duration_s": 1.7210000000000036,
+      "peak_strength": 7.47545236546444,
+      "status": "interrupted"
+    }
+  ],
+  "media_stats": {
+    "audio": {
+      "sample_rate": 48000,
+      "written_frames": 2347770,
+      "intervals": [
+        {
+          "session_start_s": 0.0,
+          "session_end_s": 48.94894850000037,
+          "wav_start_frame": 0,
+          "wav_end_frame": 2347770
+        }
+      ],
+      "source_failures": []
+    }
+  },
+  "drop_details": [],
+  "runtime": {
+    "python": "3.12.14",
+    "packages": {
+      "mediapipe": "0.10.21",
+      "opencv-contrib-python": "4.11.0.86",
+      "faster-whisper": "1.2.1",
+      "ctranslate2": "4.8.2",
+      "mss": "10.2.0",
+      "numpy": "1.26.4",
+      "scipy": "1.17.1"
+    }
+  },
+  "interpretation_boundary": "Observable data only; no psychological or confusion inference.",
+  "landmark_timing": {
+    "file": "landmark-timing.csv",
+    "clock": "session_elapsed_monotonic_seconds",
+    "max_frames": 20000,
+    "recorded_frames": 1081,
+    "omitted_frames": 0,
+    "finalized": true,
+    "outcomes": {
+      "rendered": 927,
+      "replaced": 153,
+      "stopped": 1
+    },
+    "invalid_order_frames": 0,
+    "render_boundary": "Tk canvas itemconfigure returned; not physical presentation"
+  }
+}

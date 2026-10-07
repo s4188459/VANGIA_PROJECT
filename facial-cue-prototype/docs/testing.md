@@ -1,5 +1,23 @@
 # Testing and Demonstration
 
+## Current verification: 2026-10-06
+
+After the LIVE boundary reconciliation and bounded endpoint IPC changes,
+`python -B -m unittest discover -s tests` passed all **236 tests** in 10.896 s.
+This includes the seven immediate-Stop tests. The earlier 2026-09-29 results
+below are historical, not the current baseline.
+
+The first full run found a timing-dependent Pause test failure. That test now
+controls its clock and frame count rather than comparing a real sleep with
+artificially increasing task timestamps; runtime Pause code was unchanged.
+
+A real small.en replay of two previously transcribed session 014 windows
+reproduced and then removed the boundary repetition while retaining new text.
+Raw-file hashes stayed unchanged. This is not a WER evaluation or a live
+hardware performance test. See
+`../../test-results/live-transcript-improvement-2026-10-06/change-log.md`
+and `replay-report.json` in that directory for commands, settings and limits.
+
 ## Recorded verification: 2026-09-29
 
 The repository-preparation run used the existing Windows Python 3.12 environment:

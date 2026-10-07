@@ -1,0 +1,118 @@
+{
+  "session_id": "session_002",
+  "report_created_on": "2026-10-07",
+  "purpose": "Retrospective per-session configuration record; not an executable app configuration.",
+  "source_manifest": "session.json",
+  "source_manifest_sha256": "b0d0076ab6ebfbdbf383f638326ea6c68e23757eaed83bcfd7188dcd660f3dbd",
+  "capture_started_at": "2026-10-01T12:03:00.842325+07:00",
+  "evidence_policy": "Recorded fields are copied from this session manifest. Null or absent parameters are not reconstructed from current source. Recorded-value differences do not alone prove a code change.",
+  "recorded_configuration": {
+    "options": {
+      "video": true,
+      "system_audio": false,
+      "microphone": false,
+      "transcript": false
+    },
+    "capture_region": {
+      "left": 1542,
+      "top": 559,
+      "width": 1146,
+      "height": 649
+    },
+    "runtime": {
+      "python": "3.12.14",
+      "packages": {
+        "mediapipe": "0.10.21",
+        "opencv-contrib-python": "4.11.0.86",
+        "faster-whisper": "1.2.1",
+        "ctranslate2": "4.8.2",
+        "mss": "10.2.0",
+        "numpy": "1.26.4",
+        "scipy": "1.17.1"
+      }
+    },
+    "audio": {
+      "sample_rate": null,
+      "channels": {},
+      "packet_timing": null,
+      "devices": null
+    },
+    "live_transcription": {},
+    "final_transcription": {
+      "status": "not_started"
+    },
+    "video": {
+      "codec": "mp4v",
+      "fps": 20.0
+    },
+    "timing_instrumentation": {
+      "file": null,
+      "clock": null,
+      "max_frames": null,
+      "render_boundary": null
+    }
+  },
+  "observed_wav_format": null,
+  "documented_context": {
+    "changes_before_this_session": "Region changed from 1158 x 641 to 1146 x 649; optional modalities unchanged. No documented code update between these runs.",
+    "changes_after_this_session_not_applied_to_recorded_config": "Disable video for the next comparison; investigate odd-height video encoding separately.",
+    "common_face_baseline": {
+      "evidence": "../../local-document-backup/notion-test-log.en.md and dated reviews; historical baseline, not a per-session parameter snapshot",
+      "model": "face_landmarker.task",
+      "mode": "VIDEO",
+      "maximum_faces": 1,
+      "detection_presence_tracking_thresholds": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "baseline_duration_s": 2.0,
+      "baseline_min_samples": 30,
+      "smoothing_window_s": 0.25,
+      "typical_action_hold_s": 0.25,
+      "release_s": 0.15,
+      "cooldown_s": 0.3,
+      "per_session_values_independently_recorded": false
+    }
+  },
+  "changes_from_previous_session": [
+    {
+      "field": "capture_region.height",
+      "previous": 641,
+      "current": 649,
+      "previous_field_recorded": true,
+      "current_field_recorded": true
+    },
+    {
+      "field": "capture_region.left",
+      "previous": 1538,
+      "current": 1542,
+      "previous_field_recorded": true,
+      "current_field_recorded": true
+    },
+    {
+      "field": "capture_region.top",
+      "previous": 563,
+      "current": 559,
+      "previous_field_recorded": true,
+      "current_field_recorded": true
+    },
+    {
+      "field": "capture_region.width",
+      "previous": 1158,
+      "current": 1146,
+      "previous_field_recorded": true,
+      "current_field_recorded": true
+    }
+  ],
+  "unknown_at_capture": [
+    "Complete source commit and uncommitted diff",
+    "Complete model artifact hashes",
+    "CPU model, RAM, operating-system build and concurrent workload",
+    "Face/action parameters are not independently snapshotted in this manifest"
+  ],
+  "supporting_documents": [
+    "manual-review.md",
+    "technical-review.md"
+  ]
+}

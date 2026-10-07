@@ -47,11 +47,16 @@ class TranscriptionMetrics:
     queued_duration_s: dict[str, float] = field(default_factory=dict)
 
 
+def endpoint_audio_context(samples: np.ndarray, sample_rate: int, *, pause_s: float) -> np.ndarray:
+    """Keep the same recent context in local and process-backed endpoint checks."""
+    return samples[-round(sample_rate * (pause_s + 1.0)):]
+
+
 def speech_has_ended(samples: np.ndarray, sample_rate: int, *, pause_s: float = UTTERANCE_PAUSE_S) -> bool:
     from faster_whisper.vad import VadOptions, get_speech_timestamps
 
     # Endpoint detection needs recent speech context, not the whole utterance.
-    samples = samples[-round(sample_rate * (pause_s + 1.0)):]
+    samples = endpoint_audio_context(samples, sample_rate, pause_s=pause_s)
     if sample_rate != 16000:
         divisor = math.gcd(sample_rate, 16000)
         samples = resample_poly(samples, 16000 // divisor, sample_rate // divisor).astype(np.float32)
@@ -112,7 +117,7 @@ class LocalEnglishTranscriber:
             "temperature": 0.0, "condition_on_previous_text": False,
             "hallucination_silence_threshold": 1.0,
             "segment_min_avg_logprob": -1.0, "segment_max_compression_ratio": 2.4,
-            "overlap_deduplication": "timed_suffix_prefix_v1",
+            "overlap_deduplication": "timed_suffix_prefix_v2",
         }
 
     def transcribe(self, chunk: AudioChunk) -> tuple[TranscriptSegment, ...]:
@@ -165,15 +170,33 @@ class LocalEnglishTranscriber:
             return " ".join(re.findall(r"[a-z]+(?:'[a-z]+)?", text.lower()))
         current = [(chunk.start_s+w.start, chunk.start_s+w.end, key(w.word)) for w in words]
         trim = 0
+        def same_audio(a, b):
+            return (abs((a[0]+a[1]-b[0]-b[1])/2) <= .35
+                    and a[1] >= chunk.start_s-.35 and b[0] < previous_end)
+
+        def negation(token):
+            return token in {"no", "not", "never", "cannot"} or token.endswith("n't")
+
         if chunk.start_s < previous_end:
             # Match only the published suffix to the new prefix at the same audio time.
             # Midpoint tolerance allows modest Whisper alignment jitter, not later repeats.
             for count in range(min(len(previous), len(current)), 0, -1):
                 left, right = previous[-count:], current[:count]
-                if all(a[2] and a[2] == b[2]
-                       and abs((a[0]+a[1]-b[0]-b[1])/2) <= .35
-                       and a[1] >= chunk.start_s-.35 and b[0] < previous_end
-                       for a,b in zip(left,right)):
+                exact = all(a[2] and a[2] == b[2] and same_audio(a, b)
+                            for a,b in zip(left,right))
+                # A forced window can start inside a word (e.g. "gonna" -> "to").
+                # Allow only that clipped first word to differ, with two or more
+                # exact, time-aligned anchors. Preserve ambiguous negation edits.
+                clipped = (count >= 3 and left[0][2] and right[0][2]
+                           and left[0][2] != right[0][2]
+                           and left[0][0] < chunk.start_s < left[0][1]
+                           and right[0][0] <= chunk.start_s + .05
+                           and min(left[0][1], right[0][1]) > max(left[0][0], right[0][0])
+                           and same_audio(left[0], right[0])
+                           and not negation(left[0][2]) and not negation(right[0][2])
+                           and all(a[2] and a[2] == b[2] and same_audio(a, b)
+                                   for a,b in zip(left[1:], right[1:])))
+                if exact or clipped:
                     trim = count
                     break
         retained = words[trim:]

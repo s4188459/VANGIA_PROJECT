@@ -4,7 +4,7 @@ from __future__ import annotations
 import multiprocessing as mp
 import threading
 
-from .transcription import LocalEnglishTranscriber, speech_has_ended
+from .transcription import LocalEnglishTranscriber, endpoint_audio_context, speech_has_ended
 
 
 def _serve(connection, model_path, factory):
@@ -70,6 +70,8 @@ class ProcessEnglishTranscriber:
         return self._request("transcribe", chunk)
 
     def speech_boundary(self, samples, sample_rate, *, pause_s):
+        # Bound IPC serialization too, not just the VAD work inside the child.
+        samples = endpoint_audio_context(samples, sample_rate, pause_s=pause_s)
         return self._request("boundary", (samples, sample_rate, pause_s))
 
     def cancel(self):
