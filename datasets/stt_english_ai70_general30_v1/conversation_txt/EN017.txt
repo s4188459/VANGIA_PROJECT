@@ -1,0 +1,7 @@
+How would k-nearest neighbours classify a new point?
+
+It finds nearby training examples and combines their labels, often by voting.
+
+What does that mean for the work needed at prediction time?
+
+It still needs to search stored examples, so prediction cost can become important as the dataset grows.

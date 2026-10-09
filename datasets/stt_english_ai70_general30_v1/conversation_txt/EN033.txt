@@ -1,0 +1,7 @@
+Why do we move opposite to the gradient during gradient descent?
+
+The gradient points toward local increase in the loss, so a suitable step in the opposite direction aims to reduce it.
+
+Does every possible step size guarantee improvement?
+
+No. An excessively large step can overshoot and increase the loss.

@@ -1,0 +1,7 @@
+Are mass and weight exactly the same physical quantity?
+
+No. Mass describes a property of matter, while weight is a gravitational force.
+
+What happens to an object's weight in a weaker gravitational field?
+
+It becomes smaller, even though the object's mass remains the same.

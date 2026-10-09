@@ -1,0 +1,7 @@
+What does the ReLU activation do to a negative input?
+
+It outputs zero. For a positive input, it returns that input value.
+
+Then its output changes in a piecewise way, which introduces nonlinearity.
+
+Correct. It is an activation function, not the loss that compares predictions with targets.

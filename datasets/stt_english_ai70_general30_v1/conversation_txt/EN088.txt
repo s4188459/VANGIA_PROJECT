@@ -1,0 +1,7 @@
+I keep confusing latitude with longitude. Which one measures distance north or south of the equator in degrees?
+
+Latitude does. Longitude describes angular position east or west of the prime meridian.
+
+So both coordinates are needed to identify a location precisely on a map.
+
+Yes. Also keep their order and directional signs consistent.

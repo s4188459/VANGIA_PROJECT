@@ -1,0 +1,7 @@
+Why do we keep a key-value cache during autoregressive decoding?
+
+It lets a new position reuse previously computed keys and values instead of recomputing that history each step.
+
+We still calculate a new query, key, and value for the newly processed position?
+
+Yes, and the new key and value are added to the cache.

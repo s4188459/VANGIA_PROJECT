@@ -1,0 +1,7 @@
+I keep checking the test score after every change. Is that still a fair final test?
+
+Those results are influencing your decisions, so the set is effectively becoming part of model selection.
+
+I should use validation data for those choices and reserve another set for the final evaluation.
+
+Yes. Clearly document which data influenced your decisions.

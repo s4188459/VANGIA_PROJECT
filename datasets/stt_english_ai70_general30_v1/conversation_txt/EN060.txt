@@ -1,0 +1,7 @@
+Where does rotary position information enter attention in the setup we studied?
+
+RoPE rotates pairs of dimensions in queries and keys according to their positions.
+
+Is RoPE an activation function like ReLU?
+
+No. It represents position inside attention, helping query-key interactions reflect relative positional relationships.

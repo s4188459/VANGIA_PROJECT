@@ -1,0 +1,7 @@
+Why are convolutional networks useful for image patterns?
+
+Convolutions apply shared filters across local regions, allowing a filter to detect a pattern at different positions.
+
+Does every position need its own completely separate filter weights?
+
+No. Sharing those weights is a key part of the convolution operation.

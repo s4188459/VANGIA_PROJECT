@@ -1,0 +1,7 @@
+What makes this learning task supervised?
+
+Each training example contains an input and a target that tells us the expected answer.
+
+Right. The model uses those pairs to learn a mapping that we hope will work on new examples.
+
+Then a label can be a number, not just a category name.

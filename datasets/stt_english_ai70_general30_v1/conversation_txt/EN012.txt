@@ -1,0 +1,7 @@
+When did you fit the PCA transformation in your experiment?
+
+I fitted it on the whole dataset before creating the training and test sets.
+
+That lets information from the test data influence preprocessing. Split first and fit the transformation on training data.
+
+Then I apply that same learned transformation to the other sets.

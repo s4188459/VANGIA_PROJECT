@@ -1,0 +1,7 @@
+A decision tree seems like a sequence of questions. Is that a useful way to understand it?
+
+Yes. Each split uses a feature condition to send an example down a branch.
+
+Could a very deep tree memorize unusual details in the training set?
+
+It can, which is why controlling complexity and checking validation performance matter.

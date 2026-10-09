@@ -1,0 +1,7 @@
+How does mean squared error treat a prediction that is far from the target?
+
+It squares the difference, so a large error contributes much more than a small one.
+
+Right. What else do we do after calculating those squared errors?
+
+We average them over the examples being evaluated.

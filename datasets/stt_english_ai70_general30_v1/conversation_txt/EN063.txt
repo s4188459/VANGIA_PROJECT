@@ -1,0 +1,7 @@
+How can regularization help when a model fits the training set too closely?
+
+Some forms add a penalty that discourages overly large parameter values and changes the objective being optimized.
+
+Can making the penalty very strong also hurt performance?
+
+Yes. Too much regularization can make the model fit useful patterns poorly.

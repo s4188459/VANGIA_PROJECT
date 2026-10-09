@@ -1,0 +1,7 @@
+Should I use the same activation for every model output?
+
+Match the output to the task. A sigmoid is common for binary probabilities, while softmax is common for mutually exclusive classes.
+
+And ordinary numerical regression may use an unbounded output.
+
+Yes. The target's structure should guide that choice.

@@ -1,0 +1,7 @@
+What happens if we stack linear layers without nonlinear activations between them?
+
+I thought additional layers would automatically make the network more expressive.
+
+Their composition is still an affine transformation in this setting. Nonlinear activations allow more complex functions.
+
+So depth alone is not enough if every transformation stays linear.

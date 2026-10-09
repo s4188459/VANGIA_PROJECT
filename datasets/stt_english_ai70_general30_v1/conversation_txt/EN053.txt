@@ -1,0 +1,7 @@
+Are queries, keys, and values three unrelated copies of the input?
+
+They are projections of representations, learned for different roles within attention.
+
+Queries and keys produce compatibility scores, while values provide the information being combined?
+
+That is a useful starting intuition. The resulting vector is still a representation, not a word by itself.

@@ -1,0 +1,7 @@
+If I assign a new value to a variable, does that always change every other variable with a similar name?
+
+No. Similar names do not establish a connection. Behavior depends on assignments, references, and the language's rules.
+
+So I should trace which value or object each variable actually refers to.
+
+Exactly. Names alone do not determine data flow.

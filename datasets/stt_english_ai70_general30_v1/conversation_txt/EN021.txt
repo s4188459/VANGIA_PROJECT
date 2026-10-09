@@ -1,0 +1,7 @@
+Why is the classifier called naive Bayes?
+
+It uses Bayes' rule with a simplifying assumption that features are conditionally independent given the class.
+
+Does that mean every word in a sentence is truly independent of the others?
+
+No. It is a modeling assumption that can be useful even when reality is more complicated.

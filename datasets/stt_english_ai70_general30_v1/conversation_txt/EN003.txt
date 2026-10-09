@@ -1,0 +1,7 @@
+Our dataset has measurements but no target labels. Can we still explore it with machine learning?
+
+Yes. Unsupervised methods can find structure, such as groups of similar observations.
+
+Would those groups automatically match the categories a teacher would choose?
+
+No. You still need to interpret the groups and decide whether they are useful.

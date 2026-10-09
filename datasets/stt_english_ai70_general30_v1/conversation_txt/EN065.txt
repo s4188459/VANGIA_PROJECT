@@ -1,0 +1,7 @@
+Are a batch and an epoch the same thing?
+
+No. A mini-batch contains a subset processed in one step, while an epoch usually means one pass through the training set.
+
+Then one epoch can include many parameter updates.
+
+Exactly. State both batch size and training duration when describing your experiment.

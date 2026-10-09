@@ -1,0 +1,7 @@
+What changes when we move from one decision tree to a random forest?
+
+We train multiple trees with randomness and combine their predictions.
+
+Why might that help compared with relying on one tree?
+
+Combining different trees can reduce sensitivity to the particular training sample, although we still need to evaluate the result.

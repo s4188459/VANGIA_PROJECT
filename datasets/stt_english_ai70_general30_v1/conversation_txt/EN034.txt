@@ -1,0 +1,7 @@
+Your loss is jumping around after each update. What setting might you investigate?
+
+The learning rate might be too large, although I should check the data and implementation too.
+
+And what might happen if it is extremely small?
+
+Progress can be very slow, so I would compare reasonable values using validation results.

@@ -1,0 +1,7 @@
+An image can show a dog outdoors at night. Should I force it into just one category?
+
+Not if all those labels matter. A multilabel model can predict several labels for the same image.
+
+Then outdoor and dog are separate decisions rather than competing alternatives?
+
+Exactly. Several labels can be true at once.

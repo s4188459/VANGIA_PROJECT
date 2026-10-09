@@ -1,0 +1,7 @@
+Some measurements are missing. Should I replace every missing value with zero?
+
+Only if zero has an appropriate meaning. Otherwise, you could introduce a misleading pattern.
+
+I should examine why values are missing and choose a documented handling strategy.
+
+Yes. Fit any learned imputation rule using training data.

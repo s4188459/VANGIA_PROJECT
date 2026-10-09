@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="vi">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>STT Bench · So sánh model</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head>
+<body>
+<header><div class="brand"><span class="mark">≋</span> STT Bench <span class="local">LOCAL</span></div><span class="header-note">Audio → Transcript → Đánh giá</span></header>
+<main>
+  <section class="intro"><div class="eyebrow">MODEL EVALUATION WORKSPACE</div><h1>Cùng một bộ audio.<br>So sánh từng model.</h1><p>Nhập dataset, chọn cấu hình và đối chiếu bản nhận dạng với transcript đã kiểm tra.</p></section>
+  <div id="notice" role="status" aria-live="polite" hidden></div>
+  <div class="workspace">
+    <aside>
+      <section class="card"><div class="section-title"><span class="step">01</span><h2>Dataset</h2></div>
+        <label for="dataset">Dataset đã nhập</label><select id="dataset"><option value="">Chưa có dataset</option></select>
+        <div id="dataset-meta" class="muted"></div>
+        <details id="upload-details" open><summary>Nhập dataset mới</summary>
+          <form id="upload-form">
+            <label for="dataset-name">Tên dataset</label><input id="dataset-name" placeholder="English teaching · pilot 5" maxlength="120" required>
+            <label for="language">Ngôn ngữ</label><select id="language"><option value="en">English</option><option value="vi">Tiếng Việt</option></select>
+            <label class="file-box" for="zip">Chọn file ZIP<input id="zip" type="file" accept=".zip,application/zip" required></label>
+            <p class="hint">Ghép cùng tên: <code>audio/EN001.mp3</code> + <code>transcripts/EN001.txt</code>. Nhận WAV, MP3, M4A, FLAC, OGG, OPUS, AAC, WebM và TXT UTF-8. Có thể trộn định dạng trong ZIP. Tối đa 512 MB/ZIP, 128 MB và 10 phút/mẫu; 1–1.000 cặp.</p>
+            <p class="hint">Tool giữ file gốc và tự tạo audio mono 16 kHz để mọi model dùng chung. Phần nghe thử phát bản đã chuyển đổi.</p>
+            <button id="upload" type="submit" class="secondary full">Kiểm tra & nhập dataset</button>
+          </form>
+        </details>
+        <div id="preview" hidden><label for="sample">Nghe & kiểm tra mẫu</label><select id="sample"></select><audio id="audio" controls preload="none"></audio><p id="reference-preview" class="transcript"></p></div>
+      </section>
+      <section class="card"><div class="section-title"><span class="step">02</span><h2>Model</h2></div>
+        <label for="model-scope">Phạm vi benchmark</label><select id="model-scope"><option value="manual">Chọn model thủ công</option><option value="saved">Tất cả cấu hình đã lưu phù hợp</option><option value="catalog">Tất cả model phù hợp trong danh mục + cấu hình đã lưu</option></select>
+        <label class="check"><input id="batch-download" type="checkbox"> Cho phép tải weights cho model thêm từ danh mục (có thể nhiều GB).</label>
+        <p id="batch-plan" class="hint"></p>
+        <p class="hint">Các model chạy lần lượt trên cùng dataset; model lỗi được ghi vào báo cáo và tiếp tục model sau.</p><div id="model-list"></div>
+        <label for="catalog-language">Lọc danh mục model</label><select id="catalog-language"><option value="all">English & Vietnamese</option><option value="en">English</option><option value="vi">Vietnamese</option></select>
+        <label for="catalog">Model có sẵn trong danh mục</label><select id="catalog"></select>
+        <p id="catalog-note" class="hint"></p><button id="use-preset" type="button" class="secondary full">Điền cấu hình model này</button>
+        <p class="hint">Danh mục không đồng nghĩa model đã được tải. Tối đa 50 cấu hình/lượt. Chế độ tất cả bỏ qua backend chưa cài và cloud chưa được cho phép; weights thiếu sẽ báo lỗi nếu chưa bật tải.</p>
+        <details id="model-details"><summary>Thêm / sửa cấu hình</summary><form id="model-form">
+          <label for="model-label">Tên cấu hình <span class="muted">(cùng tên sẽ cập nhật)</span></label><input id="model-label" placeholder="small.en · CPU INT8" required maxlength="100">
+          <label for="backend">Backend</label><select id="backend"><option value="faster-whisper">faster-whisper</option><option>transformers-whisper</option><option>transformers-ctc</option><option>qwen-asr</option><option>nemo</option><option>sensevoice</option><option>vosk</option><option>elevenlabs</option><option>google-chirp</option></select>
+          <p id="backend-note" class="hint"></p>
+          <label for="backend-python">Python riêng cho backend (để trống dùng server)</label><input id="backend-python" placeholder="…\stt-benchmark\.backends\vosk\Scripts\python.exe">
+          <label for="model-languages">Ngôn ngữ checkpoint</label><select id="model-languages"><option value="en,vi">English + Vietnamese</option><option value="en">English</option><option value="vi">Vietnamese</option></select>
+          <label for="model-path">Thư mục local hoặc tên model</label><input id="model-path" placeholder="D:\models\whisper-small hoặc small" required>
+          <div class="form-grid"><div><label for="device">Thiết bị</label><select id="device"><option value="cpu">CPU</option><option value="cuda">CUDA</option></select></div><div><label for="compute">Compute type</label><select id="compute"><option>int8</option><option>float32</option><option>float16</option><option>int8_float16</option></select></div><div><label for="beam">Beam size</label><input type="number" id="beam" value="5" min="1" max="10"></div><div><label for="threads">CPU threads</label><input type="number" id="threads" value="4" min="1" max="64"></div></div>
+          <label class="check"><input id="vad" type="checkbox" checked> Bỏ qua vùng không có giọng nói (VAD)</label>
+          <label class="check"><input id="download" type="checkbox"> Cho phép tải model từ mạng khi chạy</label>
+          <p class="hint">INT8 và VAD tùy chỉnh chỉ có ở faster-whisper. Beam tùy chỉnh có ở faster-whisper và Transformers Whisper. Backend khác dùng decoder mặc định; Vosk/cloud không áp dụng compute type và CPU threads.</p>
+          <button type="submit" class="secondary full">Lưu cấu hình</button>
+        </form></details>
+      </section>
+      <section class="card run-controls"><div class="section-title"><span class="step">03</span><h2>Chạy benchmark</h2></div>
+        <label for="benchmark-mode">Cách đưa audio vào model</label><select id="benchmark-mode"><option value="final">Cả file</option><option value="live_replay">Chia đoạn tuần tự (mô phỏng)</option></select>
+        <label for="chunk-seconds">Độ dài đoạn (giây; chỉ dùng khi chia đoạn)</label><input id="chunk-seconds" type="number" min="1" max="15" step="0.5" value="3">
+        <p class="hint">Chia đoạn cố định, không chồng lấn, model nhận từng đoạn độc lập. Đo thời gian xử lý và hàng đợi mô phỏng; không đo microphone hay streaming native của model.</p>
+        <label class="check"><input id="cloud-consent" type="checkbox"> Cho phép gửi audio đến dịch vụ cloud đã chọn (có thể tính phí).</label>
+        <label class="check"><input id="reviewed" type="checkbox"> Tôi đã nghe và kiểm tra transcript chuẩn khớp với audio.</label>
+        <button id="run" class="primary full">Chạy đánh giá <span>→</span></button>
+        <p class="hint">Transcript chuẩn chỉ dùng để chấm điểm. Model local xử lý trên máy; model API gửi audio tới nhà cung cấp.</p>
+      </section>
+    </aside>
+    <section class="results">
+      <section class="card"><div class="results-heading"><div><div class="eyebrow">BENCHMARK REPORT</div><h2>Kết quả đánh giá</h2></div><select id="history" aria-label="Lịch sử lần chạy"><option value="">Chưa có lần chạy</option></select></div>
+        <div id="empty"><div class="empty-symbol">≋</div><h3>Sẵn sàng cho lần chạy đầu tiên</h3><p>Bắt đầu với 5 mẫu đã thu và kiểm tra.<br>Khi quy trình ổn, mở rộng đủ 100 mẫu.</p><div class="empty-flow"><span>Audio + TXT</span><b>→</b><span>Model</span><b>→</b><span>WER & thời gian</span></div></div>
+        <div id="report" hidden>
+          <div class="progress-row"><strong id="run-message"></strong><button id="cancel" class="secondary" hidden>Dừng sau mẫu hiện tại</button></div>
+          <progress id="progress" max="1" value="0"></progress><p id="run-meta" class="hint"></p>
+          <div class="table-scroll"><table><thead><tr><th>Model</th><th>Thành công</th><th>Lỗi</th><th>WER ↓</th><th>WER chung ↓</th><th>CER ↓</th><th>CER chung ↓</th><th>Xử lý (s) ↓</th><th>RTF ↓</th><th>P95 xử lý đoạn ↓</th><th>P95 trễ sau cuối đoạn ↓</th><th>P95 chữ đầu ↓</th></tr></thead><tbody id="summary"></tbody></table></div>
+          <p id="comparison-note" class="hint"></p>
+          <div class="exports"><a id="summary-csv" class="secondary" href="#">CSV tổng hợp · mỗi model một dòng</a><a id="csv" class="secondary" href="#">CSV từng mẫu</a><a id="json" class="secondary" href="#">Tải báo cáo JSON</a></div>
+        </div>
+      </section>
+      <section class="card" id="detail-card" hidden><div class="results-heading"><h2>Đối chiếu từng mẫu</h2><select id="detail-model" aria-label="Model xem chi tiết"></select></div><div id="sample-results"></div></section>
+      <section class="notes"><h3>Đọc kết quả</h3><p><strong>WER</strong> = (từ sai + từ thiếu + từ thêm) / tổng từ chuẩn. <strong>CER</strong> tương tự theo ký tự, bỏ khoảng trắng và giữ dấu tiếng Việt. WER tiếng Việt ở mức đơn vị cách nhau bằng khoảng trắng. Chỉ số <strong>chung</strong> tính trên các mẫu mọi model thành công. <strong>RTF</strong> = thời gian xử lý / thời lượng audio.</p><p>P95 lấy phân vị nearest-rank. Trễ mô phỏng tính từ cuối đoạn tới lúc có kết quả, gồm hàng đợi một worker; chữ đầu tính từ đầu audio tới đoạn đầu có văn bản. Không bao gồm microphone, mạng giao diện hoặc phát hiện điểm kết thúc câu của app. Không gộp kết quả khác ngôn ngữ hoặc khác chế độ để xếp hạng.</p><p>Không tính nạp model vào RTF. Chưa warm-up riêng; mẫu đầu có thể chậm hơn. API gồm thời gian upload và chờ nhà cung cấp. Transformers xử lý theo block 30 giây cho file dài; CTC dùng greedy, không LM ngoài. Mọi cấu hình và giao thức được lưu trong JSON.</p></section>
+    </section>
+  </div>
+</main><footer>STT Bench · Dữ liệu và báo cáo lưu trên máy của bạn.</footer>
+</body></html>

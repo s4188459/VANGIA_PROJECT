@@ -1,0 +1,7 @@
+During causal language-model training, can a position attend to later answer tokens?
+
+The causal mask blocks future positions. It can attend to allowed earlier positions and itself.
+
+That prevents the prediction from using future context it would not have during generation.
+
+Exactly. The mask enforces the intended direction of information flow.

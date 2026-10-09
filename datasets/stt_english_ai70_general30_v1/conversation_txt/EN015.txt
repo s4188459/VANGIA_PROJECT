@@ -1,0 +1,7 @@
+How does linear regression combine several input features into a prediction?
+
+It multiplies each feature by a weight, adds those contributions, and includes an intercept.
+
+Training changes the weights to reduce the error on the training data?
+
+Yes. Remember that the result is a numerical prediction, rather than a class label.

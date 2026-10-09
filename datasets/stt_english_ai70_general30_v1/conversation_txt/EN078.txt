@@ -1,0 +1,7 @@
+Why does the bulb go out when I open this switch?
+
+Opening the switch breaks the conducting path in this simple circuit.
+
+So the current no longer flows through the bulb along that path.
+
+Correct. Draw the complete circuit and mark where the connection is interrupted.

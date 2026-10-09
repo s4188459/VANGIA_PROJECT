@@ -1,0 +1,7 @@
+How would you solve three x plus five equals twenty?
+
+I subtract five from both sides, leaving three x equals fifteen.
+
+What is your next step?
+
+Divide both sides by three, so x equals five. I can substitute it into the original equation to check.

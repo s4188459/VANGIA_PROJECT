@@ -1,0 +1,7 @@
+Can I use mean absolute percentage error if some target values are zero?
+
+Ordinary MAPE divides by the target magnitude, so zero targets cause a problem and near-zero targets can dominate.
+
+Then I should consider another metric and explain why.
+
+Yes. Check the target distribution before deciding how to measure error.

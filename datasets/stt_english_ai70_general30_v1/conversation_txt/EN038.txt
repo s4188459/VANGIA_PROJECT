@@ -1,0 +1,7 @@
+I understand correct predictions, but I keep mixing up false positives and false negatives.
+
+First define the positive class. A false positive predicts positive when the actual label is negative.
+
+Then a false negative misses an example that is actually positive.
+
+Correct. The confusion matrix separates those error types.

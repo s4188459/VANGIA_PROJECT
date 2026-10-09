@@ -1,0 +1,7 @@
+Why did you divide the data into training and validation sets?
+
+I fit the model on training examples and use validation examples to compare my choices.
+
+Does the validation set directly supply the usual training updates?
+
+No. It guides decisions such as model selection and settings, rather than ordinary parameter fitting.

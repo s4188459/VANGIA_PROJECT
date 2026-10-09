@@ -1,0 +1,7 @@
+Our model worked on quiet recordings, but it struggles with noisy classroom audio. Why?
+
+The conditions differ from the data used to develop and evaluate it. That is one form of distribution shift.
+
+Then our evaluation should include the conditions we expect in practice.
+
+Yes. Describe which environments your evidence actually covers.

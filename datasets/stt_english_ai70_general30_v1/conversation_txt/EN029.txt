@@ -1,0 +1,7 @@
+Our model trains with one loss but the report lists several metrics. Is that inconsistent?
+
+No. The loss supplies a training signal, while evaluation metrics describe aspects of performance we care about.
+
+Then choosing a useful loss does not remove the need to choose appropriate metrics.
+
+Exactly. Explain both choices in your report.

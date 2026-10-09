@@ -1,0 +1,7 @@
+We want to compare plant growth under different amounts of light. Can we also change the soil type?
+
+Changing both makes it harder to identify which factor explains the difference.
+
+We should keep the other relevant conditions as similar as possible.
+
+Yes, and define how and when you will measure growth.

@@ -1,0 +1,7 @@
+Why does your loop keep running after the expected number of steps?
+
+I forgot to update the counter used in the stopping condition.
+
+How can you check that without guessing?
+
+Trace the counter and condition after each iteration, then verify that the loop eventually reaches its stopping state.

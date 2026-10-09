@@ -1,0 +1,7 @@
+How does an autoregressive language model extend a prompt?
+
+It predicts a distribution for the next token, selects a token, appends it, and repeats.
+
+Does it produce the entire answer in one classification decision?
+
+No. The answer is built through successive decoding steps.

@@ -1,0 +1,7 @@
+These training and test examples look almost identical. Why could that be a problem?
+
+The evaluation may reward remembering examples rather than handling genuinely new data.
+
+What would you check before trusting the score?
+
+I would look for duplicates and related groups that should stay together when splitting the dataset.

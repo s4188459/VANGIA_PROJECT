@@ -1,0 +1,7 @@
+I want to build an AI model for our course project. Should I start by choosing an algorithm?
+
+Start with the problem. Describe the input, the output you need, and how you will judge whether the result is useful.
+
+So predicting a score is different from assigning a category?
+
+Exactly. Define the target before comparing models.

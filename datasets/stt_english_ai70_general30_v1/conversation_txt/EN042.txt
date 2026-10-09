@@ -1,0 +1,7 @@
+If I lower the positive decision threshold, will the model flag more examples?
+
+For the same scores, yes. That can catch more actual positives, but it can also add false positives.
+
+So I need to choose a threshold according to the error trade-off.
+
+Exactly. A default cutoff is not automatically best for your task.

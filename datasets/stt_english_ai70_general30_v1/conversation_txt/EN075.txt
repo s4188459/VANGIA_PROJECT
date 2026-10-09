@@ -1,0 +1,7 @@
+A fair coin landed on heads three times. Is tails more likely on the next toss?
+
+Not if the tosses are independent. Each new toss still has an equal chance of heads or tails.
+
+The next outcome does not have to balance the previous ones.
+
+Correct. Short sequences can look uneven.

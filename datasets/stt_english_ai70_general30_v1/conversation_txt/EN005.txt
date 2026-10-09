@@ -1,0 +1,7 @@
+Our email dataset uses spam and not spam as labels. Does that count as binary classification?
+
+Yes. Each example belongs to one of two classes in this task.
+
+Does the model have to return the final label directly?
+
+It may first produce a score or probability, which a decision rule turns into a label.

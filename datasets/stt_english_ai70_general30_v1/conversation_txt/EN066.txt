@@ -1,0 +1,7 @@
+Why might feature scaling matter for a distance-based classifier?
+
+A feature measured on a much larger numerical scale can dominate the distance calculation.
+
+Where should you learn the scaling parameters?
+
+From the training data, then apply the same transformation to validation and test examples.

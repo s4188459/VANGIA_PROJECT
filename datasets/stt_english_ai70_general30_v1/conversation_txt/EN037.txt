@@ -1,0 +1,7 @@
+How does a recurrent neural network carry information through a sequence?
+
+It updates a hidden state as it processes successive inputs.
+
+What limitation can that introduce for computation?
+
+The dependence between steps limits parallel processing across time, and learning long-range relationships can also be difficult.

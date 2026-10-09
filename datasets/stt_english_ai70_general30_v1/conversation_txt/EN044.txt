@@ -1,0 +1,7 @@
+Our positive class is rare. Why did you ask me to examine the precision-recall curve?
+
+It shows how well the model retrieves positives and how many predicted positives are correct across thresholds.
+
+So it can reveal behavior that a high overall accuracy might hide.
+
+Yes. Always connect the evaluation to the class you care about.

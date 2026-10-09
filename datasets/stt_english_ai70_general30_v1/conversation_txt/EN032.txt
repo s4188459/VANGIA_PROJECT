@@ -1,0 +1,7 @@
+What does backpropagation calculate in a neural network?
+
+It calculates gradients of the loss with respect to parameters through the computational graph.
+
+Does it choose the learning rate for us?
+
+No. The optimizer uses the gradients, and the learning rate controls the update size.

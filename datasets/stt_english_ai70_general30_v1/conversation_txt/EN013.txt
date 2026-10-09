@@ -1,0 +1,7 @@
+Is an embedding just a category number assigned to a word?
+
+An embedding is a vector representation. Its several numerical values can express relationships learned for a particular task.
+
+Does every dimension have an obvious meaning, like animal or location?
+
+Usually not. Useful relationships can be distributed across many dimensions.

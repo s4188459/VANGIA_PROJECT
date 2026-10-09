@@ -1,0 +1,7 @@
+In five-fold cross-validation, how many folds train the model in each round?
+
+Four train it, and the remaining fold is used for evaluation. We rotate the held-out fold.
+
+Does getting five scores automatically constitute a significance test?
+
+No. Cross-validation and significance testing answer different questions.

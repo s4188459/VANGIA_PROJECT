@@ -1,0 +1,7 @@
+How do mean absolute error and root mean squared error differ?
+
+Both can be expressed in the target's units, but squared errors make RMSE more sensitive to large misses.
+
+Should you choose whichever gives the smaller numerical score?
+
+No. I should choose based on which kinds of error matter for the task.

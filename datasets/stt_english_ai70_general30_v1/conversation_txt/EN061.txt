@@ -1,0 +1,7 @@
+Training performance keeps improving, but validation performance is getting worse. What could explain that?
+
+The model may be fitting details that do not generalize beyond the training examples.
+
+So a lower training loss is not sufficient evidence that the model improved.
+
+Correct. Inspect the validation results and check for other causes as well.

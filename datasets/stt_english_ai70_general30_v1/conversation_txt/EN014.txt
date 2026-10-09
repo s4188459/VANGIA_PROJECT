@@ -1,0 +1,7 @@
+Does a tokenizer always turn each word into exactly one token?
+
+I assumed it did, but a word might be split into smaller pieces.
+
+Correct. The tokenization depends on the tokenizer and the text, including language and punctuation.
+
+So counting words does not tell me the exact number of tokens.

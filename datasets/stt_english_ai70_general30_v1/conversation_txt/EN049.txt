@@ -1,0 +1,7 @@
+How is a permutation test different from simply reporting two scores?
+
+It compares the observed difference with a distribution generated under a specified null hypothesis.
+
+In a paired comparison, can we exchange the two systems' outcomes within examples when that assumption is appropriate?
+
+Yes. The shuffling scheme must match the hypothesis and the data structure.

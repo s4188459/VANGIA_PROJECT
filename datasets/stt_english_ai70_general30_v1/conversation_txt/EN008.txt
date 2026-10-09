@@ -1,0 +1,7 @@
+In our house dataset, are the floor area and the selling price both input features?
+
+That depends on your task. If you predict the selling price, it is the target, while floor area can be an input.
+
+So I should not accidentally include the answer among the features.
+
+Correct. Check what information would actually be available when making a prediction.

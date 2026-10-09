@@ -1,0 +1,7 @@
+Can I summarize training as forward, loss, backward, and update?
+
+Yes. The forward pass makes a prediction, the loss compares it with the target, and backward computes gradients.
+
+Then the optimizer changes the parameters before the next step.
+
+Exactly. Keep those stages separate when you explain the process.

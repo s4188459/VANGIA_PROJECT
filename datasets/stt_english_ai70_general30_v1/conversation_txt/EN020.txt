@@ -1,0 +1,7 @@
+What does the margin mean in a support vector machine?
+
+It describes separation around the decision boundary. The method seeks a boundary with a large margin under its constraints.
+
+Are support vectors the examples that help determine that boundary?
+
+Yes. They are influential points associated with the margin, not a separate collection of output labels.

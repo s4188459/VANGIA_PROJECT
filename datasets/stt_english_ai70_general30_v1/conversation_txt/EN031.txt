@@ -1,0 +1,7 @@
+What happens to cross-entropy when the model assigns a very low probability to the correct class?
+
+The loss becomes large. It penalizes being confidently wrong about that class.
+
+So a correct final label does not tell us the exact cross-entropy value.
+
+Correct. The loss also depends on the probability assigned to the correct answer.

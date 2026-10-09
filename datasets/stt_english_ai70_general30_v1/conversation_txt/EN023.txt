@@ -1,0 +1,7 @@
+Why not initialize every hidden neuron with exactly the same weights?
+
+Symmetric neurons can produce the same output and receive the same updates, leaving them learning the same function.
+
+Different initial weights help them learn different transformations?
+
+Yes. Initialization should break that symmetry while keeping the scale of the values appropriate.

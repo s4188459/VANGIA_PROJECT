@@ -1,0 +1,7 @@
+Does ROC-AUC evaluate only the predictions made at a threshold of one half?
+
+No. It summarizes discrimination across thresholds using true-positive and false-positive rates.
+
+Does a high value automatically choose our operating threshold?
+
+No. We still need to decide which trade-off is appropriate when making actual decisions.

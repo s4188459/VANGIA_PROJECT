@@ -1,0 +1,7 @@
+Why did you save the checkpoint with the best validation result instead of the final training checkpoint?
+
+Later training did not improve validation performance, so I used early stopping to avoid continuing indefinitely.
+
+Did you use the final test set to choose that checkpoint?
+
+No. The checkpoint choice was based on validation data.

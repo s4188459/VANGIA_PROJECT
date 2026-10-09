@@ -1,0 +1,7 @@
+Why can I not add the denominators when adding one half and one quarter?
+
+They describe different sizes of parts. First express both fractions with the same denominator.
+
+One half becomes two quarters, so the sum is three quarters.
+
+Correct. Drawing one whole divided into four equal parts can make the reasoning clearer.

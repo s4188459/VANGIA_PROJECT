@@ -1,0 +1,7 @@
+Suppose we predict how many minutes a journey will take. What kind of output do we need?
+
+A numerical estimate, so I would treat it as a regression task.
+
+And if we predict whether the journey will be short, medium, or long?
+
+Then we are predicting categories, so it becomes classification.

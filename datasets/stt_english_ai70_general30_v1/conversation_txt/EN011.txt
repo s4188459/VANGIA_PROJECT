@@ -1,0 +1,7 @@
+Does principal component analysis predict the target for us?
+
+No. PCA transforms the input into new directions that capture variation in the data.
+
+Then I can keep fewer components and give that representation to another model?
+
+Yes, but retaining high variance does not guarantee that you retain everything useful for prediction.

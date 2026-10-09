@@ -1,0 +1,7 @@
+My program reports an index error when it reads the last item in the list.
+
+Check the valid index range and the value your loop produces at its final iteration.
+
+I used the length of the list as an index, but indexing starts at zero here.
+
+Right. The last valid index is one less than the length.

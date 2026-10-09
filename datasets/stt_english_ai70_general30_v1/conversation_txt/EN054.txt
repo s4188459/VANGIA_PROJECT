@@ -1,0 +1,7 @@
+What happens before softmax in scaled dot-product attention?
+
+We calculate query-key dot products and divide by the square root of the key dimension.
+
+Why include that scale factor?
+
+It helps control the magnitude of the scores as the key dimension grows.

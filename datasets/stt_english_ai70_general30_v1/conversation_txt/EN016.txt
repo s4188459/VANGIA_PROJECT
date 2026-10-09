@@ -1,0 +1,7 @@
+Why is logistic regression used for classification even though regression is in its name?
+
+In binary classification, it converts a linear score through a sigmoid function to estimate a class probability.
+
+Then a threshold turns that probability into a decision.
+
+Exactly. The probability estimate and the final decision are different parts of the process.

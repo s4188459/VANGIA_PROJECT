@@ -1,0 +1,7 @@
+What does word error rate count in our speech-recognition benchmark?
+
+Substitutions, deletions, and insertions, divided by the number of reference words.
+
+What must we prepare before that score is meaningful?
+
+A checked reference transcript and consistent text-normalization rules for every model being compared.

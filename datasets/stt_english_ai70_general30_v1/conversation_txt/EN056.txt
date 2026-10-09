@@ -1,0 +1,7 @@
+Why use more than one attention head?
+
+Different learned projections can capture different useful relationships between positions.
+
+Do we assign one fixed human meaning to every head before training?
+
+Usually not. Their behavior is learned, and a head does not necessarily correspond to one simple concept.

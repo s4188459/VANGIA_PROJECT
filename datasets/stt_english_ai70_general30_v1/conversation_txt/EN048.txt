@@ -1,0 +1,7 @@
+How do you create a bootstrap sample from evaluation examples?
+
+I sample with replacement, so an example may appear several times while another may be absent.
+
+What can repeated bootstrap samples help us estimate?
+
+The variation of a statistic, which we can use in an uncertainty analysis.

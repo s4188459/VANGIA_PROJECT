@@ -1,0 +1,7 @@
+After softmax, do the attention weights directly tell us the next token?
+
+No. They weight the value vectors to create a contextual representation.
+
+That representation still passes through further model processing before vocabulary scores are produced.
+
+Correct. Do not confuse attention weights with the final token distribution.

@@ -1,0 +1,7 @@
+My program works for the example in the assignment. Can I assume it handles every input?
+
+No. Try different valid cases and the boundary conditions specified by the task.
+
+I should also check how it handles invalid input when the requirements include that behavior.
+
+Yes. Record what you expected and what the program actually did.

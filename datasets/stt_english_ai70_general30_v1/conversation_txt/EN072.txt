@@ -1,0 +1,7 @@
+A rectangle is eight centimeters long and three centimeters wide. How do area and perimeter differ?
+
+Area measures the space inside, while perimeter measures the distance around the edge.
+
+What are their values here?
+
+The area is twenty-four square centimeters, and the perimeter is twenty-two centimeters.

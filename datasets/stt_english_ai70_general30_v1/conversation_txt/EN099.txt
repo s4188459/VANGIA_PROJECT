@@ -1,0 +1,7 @@
+Why does this student table need a primary key?
+
+It provides a way to identify each row uniquely.
+
+Would a student's first name be a reliable choice?
+
+Usually not, because different students can share a name. A suitable unique identifier avoids that ambiguity.

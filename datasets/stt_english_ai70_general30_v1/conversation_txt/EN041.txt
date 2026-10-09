@@ -1,0 +1,7 @@
+Why might we report an F1 score alongside precision and recall?
+
+It combines them using their harmonic mean, so it reflects both kinds of performance.
+
+Does one F1 value tell us everything about the system's errors?
+
+No. I should still examine precision, recall, and the actual mistakes.

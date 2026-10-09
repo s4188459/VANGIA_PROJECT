@@ -1,0 +1,7 @@
+We want to recognize one handwritten digit in each image. How many possible classes are there?
+
+Ten, from zero to nine, and each image has one correct digit label.
+
+Good. That is a multiclass problem with mutually exclusive labels.
+
+So we choose one class, even though the model may assign scores to all ten.

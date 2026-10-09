@@ -1,0 +1,7 @@
+What is the difference between a weight and a bias in a neuron?
+
+A weight controls an input's contribution, while the bias shifts the value before activation.
+
+Good. Does the bias have to depend on the current input value?
+
+No. It is a learned parameter added separately from the weighted inputs.

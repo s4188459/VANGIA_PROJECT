@@ -1,0 +1,7 @@
+Why does a text model need information about token order?
+
+The same words in a different order can express a different meaning.
+
+Can token embeddings alone always supply the intended positions?
+
+No. The architecture needs a mechanism to represent position, such as positional encodings or rotary embeddings.

@@ -1,0 +1,7 @@
+Your model performs poorly on both training and validation examples. What possibility would you investigate?
+
+It may be underfitting, perhaps because the representation or model is too limited.
+
+Is a larger model always the first solution?
+
+No. I should also check data quality, useful features, and whether training is working correctly.

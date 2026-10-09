@@ -1,0 +1,7 @@
+Our input has three features, but the first hidden layer has four neurons. What goes into the next layer?
+
+The four activations produced by that hidden layer become its input vector.
+
+So the next layer does not simply receive the original three features again?
+
+In this sequential example, it receives the representation created by the preceding layer.

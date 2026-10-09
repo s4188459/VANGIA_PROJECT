@@ -1,0 +1,7 @@
+Our classifier flagged ten messages as spam, and eight really were spam. What is the precision?
+
+Eight out of ten, or eighty percent.
+
+Does that tell us how many of all the spam messages it found?
+
+No. We need recall to answer that different question.

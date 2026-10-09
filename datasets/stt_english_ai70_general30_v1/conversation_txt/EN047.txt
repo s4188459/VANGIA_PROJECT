@@ -1,0 +1,7 @@
+One model scored slightly better on our sample. Can I conclude it is definitely better in general?
+
+A small difference may reflect sampling variation. Consider uncertainty and whether the difference matters in practice.
+
+So I should avoid presenting a tiny improvement as conclusive.
+
+Correct. Describe the evidence and its limits.

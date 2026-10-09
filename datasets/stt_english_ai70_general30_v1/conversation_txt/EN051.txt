@@ -1,0 +1,7 @@
+Is a Transformer just one attention operation followed by a prediction?
+
+A Transformer typically stacks blocks that include attention and feed-forward processing, together with other components such as residual connections.
+
+So attention is important, but it is not the entire architecture.
+
+Exactly. Explain how representations move through the blocks.

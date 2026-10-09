@@ -1,0 +1,7 @@
+Does a forward pass update the network's weights?
+
+I used to think so, but it only computes predictions using the current parameters.
+
+What comes after that during a training step?
+
+We compute the loss, obtain gradients, and let the optimizer update the parameters.

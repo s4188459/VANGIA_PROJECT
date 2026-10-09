@@ -1,0 +1,7 @@
+There were twenty relevant documents, and the system retrieved fifteen of them. Is recall seventy-five percent?
+
+Yes, because recall compares the relevant items found with all the relevant items available.
+
+It does not use the total number of retrieved documents as its denominator.
+
+Correct. That denominator is used when calculating precision.
