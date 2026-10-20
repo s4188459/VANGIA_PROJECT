@@ -20,9 +20,9 @@ class WorkerAdapter:
             line = replies.get(timeout=1800 if message['action'] == 'load' else 600)
         except queue.Empty:
             self.process.kill()
-            raise TimeoutError('Backend quá thời gian: tối đa 30 phút nạp model / 10 phút mỗi lần nhận dạng.')
+            raise TimeoutError('Backend timeout: maximum 30 minutes to load a model / 10 minutes per inference request.')
         if not line:
-            raise RuntimeError('Backend worker đã dừng. Kiểm tra thư viện/GPU của môi trường Python đã chọn.')
+            raise RuntimeError('Backend worker stopped. Check dependencies and GPU support in the selected Python environment.')
         result = json.loads(line)
         if not result['ok']:
             raise RuntimeError(result['error'])

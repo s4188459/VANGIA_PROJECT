@@ -1,0 +1,7 @@
+Thầy ơi, con muốn phần phiên âm giữ nguyên thuật ngữ tiếng Anh trong câu tiếng Việt.
+
+The transcript should preserve English technical terms instead of translating them into Vietnamese.
+
+Vậy con sẽ thu những câu giống cách con trình bày bài trên lớp để kiểm tra nhé thầy?
+
+Đúng rồi con. A good average score is useful, but we also need to inspect the difficult samples.

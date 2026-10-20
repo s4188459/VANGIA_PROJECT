@@ -1,0 +1,7 @@
+Thưa thầy, điểm trung bình khá cao thì con có thể kết luận hệ thống hoạt động tốt chưa ạ?
+
+Con nên xem thêm những đoạn có nhiều lỗi nhất. Điểm trung bình có thể che đi một vài trường hợp rất khó.
+
+Vậy con sẽ báo cáo cả kết quả chung và kết quả của từng nhóm đoạn thu nhé thầy?
+
+Đúng rồi. Như vậy người đọc mới thấy hệ thống làm tốt ở đâu và còn hạn chế ở đâu.

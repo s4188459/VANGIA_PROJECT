@@ -1,0 +1,238 @@
+{
+  "schema_version": "1.0",
+  "language": "en",
+  "sequence_note": "run exploratory experiments progressively and preregister final evaluation; do not run exhaustive cartesian product",
+  "privacy": "consented only; public benchmark acquisition optional with license and provenance",
+  "datasets": [
+    {
+      "id": "historic_en100",
+      "role": "legacy_development",
+      "kind": "original_dataset_manifest_only",
+      "audio_present": false,
+      "confirmatory": false
+    },
+    {
+      "id": "new_eng_dev",
+      "role": "development",
+      "kind": "consented_new_dialogue",
+      "audio_present": null,
+      "confirmatory": false
+    },
+    {
+      "id": "new_eng_holdout",
+      "role": "locked_confirmatory",
+      "kind": "consented_new_dialogue",
+      "audio_present": null,
+      "confirmatory": true
+    }
+  ],
+  "experiments": [
+    {
+      "id": "T0-historic",
+      "models": "all_27_historical_configs",
+      "dataset": "historic_en100",
+      "mode": "historical_import",
+      "outputs": [
+        "legacy_parity",
+        "missingness",
+        "model_registry"
+      ],
+      "requires_audio": false
+    },
+    {
+      "id": "T1-role-offline",
+      "model_keys": [
+        "parakeet_v2",
+        "parakeet_v3",
+        "qwen_06",
+        "whisper_small_en",
+        "whisper_small",
+        "whisper_large_v3",
+        "whisper_large_v2",
+        "canary_v2",
+        "whisper_turbo"
+      ],
+      "dataset": "new_eng_dev",
+      "mode": "batch_whole_file",
+      "settings_policy": "backend_specific_explicit",
+      "replicates_cold_warm": 2,
+      "outputs": [
+        "wer",
+        "cer",
+        "sdi",
+        "rtf",
+        "load_time",
+        "resources",
+        "failure_rate"
+      ]
+    },
+    {
+      "id": "T2-live-feasibility",
+      "model_keys": [
+        "parakeet_v2",
+        "parakeet_v3",
+        "qwen_06",
+        "whisper_small_en",
+        "whisper_small"
+      ],
+      "dataset": "new_eng_dev",
+      "mode": "paced_replay_independent_chunks",
+      "chunk_seconds": [
+        1,
+        2,
+        3
+      ],
+      "overlap_seconds": [
+        0,
+        0.5
+      ],
+      "run_strategy": "progressive_one-factor-ablation",
+      "outputs": [
+        "stream_assembled_wer",
+        "batch_to_chunk_delta",
+        "lag_proxy",
+        "queue_backlog",
+        "revisions",
+        "reliability",
+        "resources"
+      ]
+    },
+    {
+      "id": "T2-native-if-supported",
+      "model_keys": [
+        "qwen_06",
+        "parakeet_v2",
+        "parakeet_v3",
+        "whisper_small_en",
+        "whisper_small"
+      ],
+      "dataset": "new_eng_dev",
+      "mode": "native_streaming",
+      "capability_gated": true,
+      "skip_if_unsupported_without_faking": true,
+      "outputs": [
+        "first_emit_lag",
+        "display_proxy",
+        "caption_stability",
+        "backlog"
+      ]
+    },
+    {
+      "id": "T3-boundaries",
+      "model_keys": "top_live_candidates_selected_on_dev_only",
+      "dataset": "new_eng_dev",
+      "mode": "paced_replay",
+      "ablations": {
+        "vad": [
+          false,
+          true
+        ],
+        "chunk_seconds": [
+          1,
+          2,
+          3
+        ],
+        "overlap_seconds": [
+          0,
+          0.5
+        ],
+        "merge_policy": [
+          "plain_concat",
+          "timestamp_or_prefix_dedupe"
+        ],
+        "context_policy": [
+          "none",
+          "supported_history_only"
+        ]
+      },
+      "run_strategy": "one_factor_at_a_time",
+      "outputs": [
+        "seam_errors",
+        "lag",
+        "revisions",
+        "wer"
+      ]
+    },
+    {
+      "id": "T4-stress",
+      "model_keys": "top_live_candidates_selected_on_dev_only",
+      "dataset": "new_eng_dev",
+      "mode": "live_microphone_or_paced_replay_labeled",
+      "conditions": [
+        "uninterrupted_15plus_minutes",
+        "speech_turn_changes",
+        "speaker_overlap",
+        "technical_terms",
+        "silence",
+        "natural_noise",
+        "device_change_if_permitted"
+      ],
+      "outputs": [
+        "backlog_slope",
+        "capture_dropouts",
+        "accuracy",
+        "lag",
+        "memory"
+      ]
+    },
+    {
+      "id": "T5-human-review",
+      "model_keys": "top_live_candidates_selected_on_dev_only",
+      "dataset": "new_eng_dev",
+      "mode": "human_annotated_study",
+      "outputs": [
+        "meaning_changing_error_rate",
+        "term_recall",
+        "comprehension_task_score",
+        "usability_rating",
+        "reviewer_agreement"
+      ],
+      "requires_reviewers": true
+    },
+    {
+      "id": "T6-held-out",
+      "model_keys": "frozen_finalists",
+      "dataset": "new_eng_holdout",
+      "mode": "paired_confirmatory_live_and_offline",
+      "configuration_locked": true,
+      "outputs": [
+        "micro_wer",
+        "critical_errors",
+        "valid_word_lag_with_coverage",
+        "resource",
+        "turnaround",
+        "paired_ci",
+        "architecture_single_vs_dual"
+      ]
+    },
+    {
+      "id": "Tdiagnostic-retry",
+      "model_keys": [
+        "qwen_17",
+        "mms_1b"
+      ],
+      "dataset": "new_eng_dev",
+      "mode": "explicit_opt_in_recovery",
+      "priority": "deferred",
+      "outputs": [
+        "backend_health",
+        "failure_reason",
+        "if_success_evidence_only"
+      ],
+      "default_enabled": false
+    }
+  ],
+  "normalization": {
+    "legacy": "nfkc-casefold-punctuation-to-space-v1",
+    "new_comparison": "must_be_declared_and_versioned"
+  },
+  "comparison_policy": {
+    "same_pcm_sha_required": true,
+    "same_reference_revision_required": true,
+    "paired_by_session": true,
+    "minimum_model_success_filter": "none; count failures",
+    "randomize_worker_run_order": true,
+    "never_leak_confirmatory_set": true
+  },
+  "provisional_targets_reference": "config/provisional_gates.json"
+}

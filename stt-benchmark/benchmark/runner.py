@@ -5,6 +5,7 @@ import importlib.metadata
 import io
 import json
 import platform
+import statistics
 import threading
 import time
 import uuid
@@ -17,6 +18,22 @@ from .catalog import supported_languages
 from .replay import validate_options, replay, percentile
 
 
+def timing_summary(rows):
+    ok = [r for r in rows if r['status'] == 'ok']
+    result = {}
+    for metric in ('wall_s', 'first_text_s', 'first_text_from_vad_s', 'finalization_from_eof_s',
+                   'finalization_from_vad_s', 'max_queue_s', 'chunk_processing_s', 'chunk_lag_s'):
+        values = [r.get(metric, r.get('replay_metrics', {}).get(metric)) for r in ok]
+        if metric in ('chunk_processing_s', 'chunk_lag_s'):
+            key = 'elapsed_s' if metric == 'chunk_processing_s' else 'lag_s'
+            values = [c[key] for r in ok for c in r.get('chunks', [])]
+        values = [v for v in values if v is not None]
+        for suffix, value in [('median', statistics.median(values) if values else None), ('p95', percentile(values)),
+                              ('max', max(values) if values else None)]:
+            result[f'{metric}_{suffix}'] = value
+    return result
+
+
 def aggregate(rows):
     ok = [r for r in rows if r["status"] == "ok"]
     words = sum(r["reference_words"] for r in ok)
@@ -24,7 +41,7 @@ def aggregate(rows):
     elapsed = sum(r["elapsed_s"] for r in ok)
     chars = sum(r.get('reference_characters', 0) for r in ok)
     chunks = [c for r in ok for c in r.get('chunks', [])]
-    return {"completed": len(ok), "failed": sum(r["status"] == "error" for r in rows),
+    return {**timing_summary(rows), "completed": len(ok), "failed": sum(r["status"] == "error" for r in rows),
             'cer': sum(r.get('character_errors', 0) for r in ok) / chars if chars else None,
             'character_errors': sum(r.get('character_errors', 0) for r in ok), 'reference_characters': chars,
             'chunk_p95_s': percentile([c['elapsed_s'] for c in chunks]),
@@ -58,7 +75,7 @@ class Runner:
         for path in (self.root / "runs").glob("*/run.json"):
             run = json.loads(path.read_text(encoding="utf-8"))
             if run["status"] in ("running", "cancelling"):
-                run.update(status="interrupted", message="Tiến trình đã dừng trước khi hoàn tất.")
+                run.update(status="interrupted", message="The process stopped before completion.")
                 for model in run["models"]:
                     if model["status"] in ("running", "loading", "queued"):
                         model["status"] = "interrupted"
@@ -67,27 +84,41 @@ class Runner:
 
     def start(self, dataset_id, configs, options=None):
         options = validate_options(options)
+        experiment = options['mode'] in ('experiment2', 'experiment3')
+        if experiment:
+            live = options['mode'] == 'experiment2'
+            configs = [dict(backend='qwen-asr' if live else 'faster-whisper',
+                model='Qwen/Qwen3-ASR-0.6B' if live else 'large-v3',
+                label='Experiment 2 — Qwen live' if live else 'Experiment 3 — Whisper offline',
+                device='cpu', compute_type='float32' if live else 'int8',
+                cpu_threads=4, beam_size=1 if live else 5, vad_filter=not live,
+                allow_download=False, languages=['en'])]
         if not isinstance(dataset_id, str) or len(dataset_id) != 32 or any(c not in "0123456789abcdef" for c in dataset_id):
-            raise ValueError("Dataset ID không hợp lệ.")
+            raise ValueError("Invalid dataset ID.")
         if not isinstance(configs, list) or not 1 <= len(configs) <= 50:
-            raise ValueError("Chọn từ 1 đến 50 cấu hình model.")
+            raise ValueError("Select 1–50 model configurations.")
         configs = [validate_config(c) for c in configs]
         if len({c["label"] for c in configs}) != len(configs):
-            raise ValueError("Tên các cấu hình trong một lần chạy phải khác nhau.")
+            raise ValueError("Configuration labels must be unique within a run.")
         dataset = json.loads((self.root / "datasets" / dataset_id / "manifest.json").read_text(encoding="utf-8"))
+        source_dataset = copy.deepcopy(dataset)
+        if experiment and dataset['language'] != 'en':
+            raise ValueError('Experiments 2 and 3 require an English dataset.')
+        if options['sample_limit']:
+            dataset['samples'] = dataset['samples'][:options['sample_limit']]
         for config in configs:
             if dataset['language'] not in supported_languages(config):
-                raise ValueError(f"{config['label']} không hỗ trợ dataset {dataset['language']}; chọn model đa ngôn ngữ hoặc chuyên ngôn ngữ này.")
+                raise ValueError(f"{config['label']} does not support dataset {dataset['language']}; choose a multilingual model or one trained for this language.")
             if config['backend'] in ('elevenlabs', 'google-chirp') and not options['allow_cloud']:
-                raise ValueError('Chọn cho phép gửi audio lên dịch vụ cloud trước khi chạy model API.')
+                raise ValueError('Authorize cloud audio uploads before running API models.')
         if dataset["language"] != "en":
             for config in configs:
                 name = config["model"].replace("\\", "/").rstrip("/").split("/")[-1]
                 if name.endswith((".en", "-en")):
-                    raise ValueError("Dataset tiếng Việt cần model đa ngôn ngữ, không dùng model .en.")
+                    raise ValueError("Vietnamese datasets require a multilingual model, not an .en model.")
         with self.lock:
             if self.thread and self.thread.is_alive():
-                raise ValueError("Đang có một lần chạy. Chờ hoàn tất hoặc dừng trước khi chạy tiếp.")
+                raise ValueError("A run is already active. Wait for completion or cancel it first.")
             run_id = uuid.uuid4().hex
             versions = {}
             for package in ("faster-whisper", "ctranslate2", "av", "torch", "transformers", "qwen-asr", "nemo_toolkit", "funasr", "vosk", "google-cloud-speech", "requests"):
@@ -95,9 +126,9 @@ class Runner:
                     versions[package] = importlib.metadata.version(package)
                 except importlib.metadata.PackageNotFoundError:
                     versions[package] = "not installed"
-            run = {"id": run_id, "created_at": utc_now(), "status": "running", "message": "Đang chuẩn bị",
+            run = {"id": run_id, "created_at": utc_now(), "status": "running", "message": "Preparing",
                    'options': options, 'cer_normalization': 'same-as-wer-without-whitespace-v1',
-                   "dataset": dataset, "normalization": NORMALIZATION,
+                   "dataset": dataset, 'source_dataset': source_dataset, "normalization": NORMALIZATION,
                    "environment": {"platform": platform.platform(), "processor": platform.processor(),
                                    "python": platform.python_version(), "packages": versions},
                    "models": [{"config": c, "status": "queued", "samples": [], "load_s": None} for c in configs],
@@ -109,13 +140,58 @@ class Runner:
             self.thread.start()
             return copy.deepcopy(run)
 
+    def resume(self, run_id):
+        if not isinstance(run_id, str) or len(run_id) != 32 or any(c not in '0123456789abcdef' for c in run_id):
+            raise ValueError('Invalid run ID.')
+        with self.lock:
+            if self.thread and self.thread.is_alive():
+                raise ValueError('A run is already active. Wait for completion or cancel it first.')
+            path = self.root / 'runs' / run_id / 'run.json'
+            original = path.read_bytes()
+            run = json.loads(original)
+            if run['status'] != 'interrupted':
+                raise ValueError('Only interrupted runs can be resumed.')
+            dataset = run['dataset']
+            folder = self.root / 'datasets' / dataset['id']
+            if json.loads((folder / 'manifest.json').read_text(encoding='utf-8')) != run.get('source_dataset', dataset):
+                raise ValueError('Dataset changed after the original run; cannot resume.')
+            # Validate all inputs, including already-scored samples, before writing.
+            for sample in dataset['samples']:
+                audio = folder / 'audio' / (sample['id'] + '.wav')
+                reference = (folder / 'transcripts' / (sample['id'] + '.txt')).read_text(encoding='utf-8')
+                if (hashlib.sha256(audio.read_bytes()).hexdigest() != sample['audio_sha256']
+                        or hashlib.sha256(reference.encode()).hexdigest() != sample['reference_sha256']):
+                    raise ValueError('Dataset changed after the original run; cannot resume.')
+            ids = {s['id'] for s in dataset['samples']}
+            for model in run['models']:
+                saved = [s['id'] for s in model['samples']]
+                if len(saved) != len(set(saved)) or not set(saved) <= ids:
+                    raise ValueError('Saved sample IDs are inconsistent; cannot resume.')
+            # Exclusive, byte-for-byte backup; failure aborts before the run is changed.
+            backup = path.with_name(f'run.before-resume-{uuid.uuid4().hex}.json')
+            with backup.open('xb') as output:
+                output.write(original)
+            run.setdefault('resumptions', []).append({'at': utc_now(), 'backup': backup.name})
+            run.update(status='running', message='Resuming saved run',
+                       completed_tasks=sum(len(m['samples']) for m in run['models']))
+            run.pop('finished_at', None)
+            for model in run['models']:
+                if len(model['samples']) < len(ids):
+                    model['status'] = 'queued'
+            self._save(run)
+            self.active = run
+            self.cancel_event.clear()
+            self.thread = threading.Thread(target=self._execute, args=(run,), daemon=True)
+            self.thread.start()
+            return copy.deepcopy(run)
+
     def _save(self, run):
         summarize(run)
         write_json(self.root / "runs" / run["id"] / "run.json", run)
 
     def get(self, run_id):
         if len(run_id) != 32 or any(c not in "0123456789abcdef" for c in run_id):
-            raise ValueError("Run ID không hợp lệ.")
+            raise ValueError("Invalid run ID.")
         with self.lock:
             if self.active and self.active["id"] == run_id:
                 return copy.deepcopy(self.active)
@@ -124,9 +200,9 @@ class Runner:
     def cancel(self, run_id):
         with self.lock:
             if not self.active or self.active["id"] != run_id or not self.thread.is_alive():
-                raise ValueError("Lần chạy này không còn hoạt động.")
+                raise ValueError("This run is no longer active.")
             self.cancel_event.set()
-            self.active.update(status="cancelling", message="Sẽ dừng sau tác vụ nạp model hoặc mẫu hiện tại.")
+            self.active.update(status="cancelling", message="Will stop after the current model load or sample.")
             self._save(self.active)
 
     def _execute(self, run):
@@ -136,14 +212,22 @@ class Runner:
             for model in run["models"]:
                 if self.cancel_event.is_set():
                     break
+                done = {row['id'] for row in model['samples']}
+                if all(sample['id'] in done for sample in dataset['samples']):
+                    if model['status'] not in ('completed', 'error'):
+                        model['status'] = 'completed'
+                    continue
                 adapter = None
                 try:
                     with self.lock:
                         model["status"] = "loading"
-                        run["message"] = f"Đang nạp {model['config']['label']}"
+                        run["message"] = f"Loading {model['config']['label']}"
                         self._save(run)
                     config = model['config']
-                    if config.get('python_executable'):
+                    if run['options']['mode'] in ('experiment2', 'experiment3'):
+                        from .experiments import ExperimentAdapter
+                        adapter = ExperimentAdapter(config, run['options']['mode'])
+                    elif config.get('python_executable'):
                         from .worker_client import WorkerAdapter
                         adapter = WorkerAdapter(config)
                     else:
@@ -154,8 +238,11 @@ class Runner:
                         if isinstance(runtime, dict):
                             model['runtime'] = runtime
                         model["load_s"] = time.perf_counter() - started
+                        model.setdefault('load_sessions', []).append(dict(at=utc_now(), seconds=model['load_s']))
                         model["status"] = "running"
                     for sample in dataset["samples"]:
+                        if sample['id'] in done:
+                            continue
                         if self.cancel_event.is_set():
                             break
                         row = {"id": sample["id"], "duration_s": sample["duration_s"]}
@@ -166,20 +253,35 @@ class Runner:
                             audio = folder / "audio" / (sample["id"] + ".wav")
                             text = (folder / "transcripts" / (sample["id"] + ".txt")).read_text(encoding="utf-8")
                             if hashlib.sha256(audio.read_bytes()).hexdigest() != sample["audio_sha256"] or hashlib.sha256(text.encode()).hexdigest() != sample["reference_sha256"]:
-                                raise ValueError("Dữ liệu đã thay đổi sau khi import; hãy import phiên bản mới.")
+                                raise ValueError("Data changed after import; import a new version.")
                             started = time.perf_counter()
-                            if run['options']['mode'] == 'live_replay':
+                            if run['options']['mode'] == 'experiment2':
+                                from .experiments import realtime_replay
+                                prediction = realtime_replay(adapter.decoder, audio, self.cancel_event.is_set)
+                            elif run['options']['mode'] == 'live_replay':
                                 prediction = replay(adapter, audio, dataset['language'],
                                                     run['options']['chunk_seconds'], self.cancel_event.is_set)
                             else:
                                 prediction = adapter.transcribe(audio, dataset["language"])
                             elapsed = time.perf_counter() - started
+                            row['wall_s'] = elapsed
+                            row['first_after_load'] = not any(r.get('load_session') == len(model['load_sessions'])
+                                                            for r in model['samples'])
+                            row['load_session'] = len(model['load_sessions'])
+                            if 'inference_s' in prediction:
+                                elapsed = prediction['inference_s']
                             row.update(status="ok", reference=text, hypothesis=prediction["text"],
                                        segments=prediction.get("segments", []), elapsed_s=elapsed,
                                        detected_language=prediction.get("detected_language"),
                                        rtf=elapsed / sample["duration_s"], **score(text, prediction["text"]))
                             if 'chunks' in prediction:
                                 row.update(chunks=prediction['chunks'], replay_metrics=prediction['replay_metrics'])
+                            if 'queue_log' in prediction:
+                                row['queue_log'] = prediction['queue_log']
+                        except InterruptedError:
+                            if self.cancel_event.is_set():
+                                break
+                            raise
                         except Exception as exc:
                             row.update(status="error", error=str(exc))
                         with self.lock:
@@ -211,8 +313,9 @@ class Runner:
                     if model["status"] == "queued":
                         model["status"] = "cancelled"
                 errors = any(m["summary"]["failed"] or m["status"] == "error" for m in run["models"])
-                run.update(status="cancelled" if cancelled else ("completed_with_errors" if errors else "completed"),
-                           message="Đã dừng" if cancelled else "Đã hoàn tất", finished_at=utc_now())
+                interrupted = cancelled and run['options']['mode'] in ('experiment2', 'experiment3')
+                run.update(status=("interrupted" if interrupted else "cancelled") if cancelled else ("completed_with_errors" if errors else "completed"),
+                           message="Cancelled" if cancelled else "Completed", finished_at=utc_now())
                 self._save(run)
         except Exception as exc:
             with self.lock:
@@ -224,6 +327,8 @@ def export_csv(run):
     out = io.StringIO(newline="")
     fields = ["model", "sample_id", "status", "wer", "cer", "character_errors", "reference_characters", "substitutions", "deletions", "insertions",
               "mode", "chunk_seconds", "chunk_p95_s", "lag_p95_s", "first_text_s",
+              "wall_s", "first_after_load", "load_session", "first_text_from_vad_s",
+              "finalization_from_eof_s", "finalization_from_vad_s", "max_queue_s",
               "reference_words", "elapsed_s", "duration_s", "reference", "hypothesis", "error"]
     writer = csv.DictWriter(out, fieldnames=fields)
     writer.writeheader()
@@ -235,7 +340,8 @@ def export_csv(run):
             value.update(model=safe(model["config"]["label"]), sample_id=row["id"])
             value.update(mode=run.get('options', {}).get('mode', 'final'),
                          chunk_seconds=run.get('options', {}).get('chunk_seconds', ''))
-            for key in ('chunk_p95_s', 'lag_p95_s', 'first_text_s'):
+            for key in ('chunk_p95_s', 'lag_p95_s', 'first_text_s', 'first_text_from_vad_s',
+                        'finalization_from_eof_s', 'finalization_from_vad_s', 'max_queue_s'):
                 value[key] = row.get('replay_metrics', {}).get(key, '')
             writer.writerow(value)
     return out.getvalue().encode("utf-8-sig")
@@ -246,6 +352,7 @@ def export_summary_csv(run):
     fields = ['model', 'backend', 'language', 'mode', 'status', 'completed', 'failed',
               'wer', 'cer', 'inference_s', 'rtf', 'load_s', 'common_sample_count',
               'common_wer', 'common_cer', 'chunk_p95_s', 'lag_p95_s', 'first_text_p95_s', 'error']
+    fields += list(timing_summary([]))
     writer = csv.DictWriter(out, fieldnames=fields)
     writer.writeheader()
     for model in run['models']:

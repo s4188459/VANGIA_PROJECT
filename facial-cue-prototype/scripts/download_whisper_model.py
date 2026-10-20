@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 import sys
 
-MODELS = ("tiny.en", "base.en", "small.en", "medium.en")
+MODELS = ("tiny.en", "base.en", "small.en", "medium.en", "large-v3")
 
 
 def model_output_path(model_name: str, root: Path = Path("models")) -> Path:

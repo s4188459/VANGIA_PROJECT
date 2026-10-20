@@ -1,0 +1,7 @@
+Thầy ơi, máy vừa khởi động lại thì con có thể resume phần benchmark đang làm dở không ạ?
+
+Có thể nếu công cụ đã lưu kết quả từng phần. Con cần giữ nguyên các kết quả cũ và chỉ xử lý phần còn thiếu.
+
+Còn checkpoint của model thì con tải lại từ cache nếu đã có đủ file nhé thầy?
+
+Đúng. Nhưng con nhớ checkpoint và kết quả benchmark là hai loại dữ liệu khác nhau, cần kiểm tra riêng.

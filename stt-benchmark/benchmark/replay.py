@@ -9,18 +9,23 @@ import wave
 def validate_options(value=None):
     value = {} if value is None else value
     if not isinstance(value, dict):
-        raise ValueError('Tùy chọn benchmark phải là object.')
+        raise ValueError('Benchmark options must be an object.')
     mode = value.get('mode', 'final')
     chunk = value.get('chunk_seconds', 3)
-    if mode not in ('final', 'live_replay'):
-        raise ValueError('Chế độ: final hoặc live_replay.')
+    if mode not in ('final', 'live_replay', 'experiment2', 'experiment3'):
+        raise ValueError('Mode must be final or live_replay.')
     if type(chunk) not in (float, int) or not math.isfinite(chunk) or not 1 <= chunk <= 15:
-        raise ValueError('Đoạn LIVE mô phỏng phải từ 1 đến 15 giây.')
+        raise ValueError('Simulated chunks must be between 1 and 15 seconds.')
     cloud = value.get('allow_cloud', False)
     if type(cloud) is not bool:
-        raise ValueError('allow_cloud phải là boolean.')
-    return {'mode': mode, 'chunk_seconds': chunk, 'allow_cloud': cloud,
-            'protocol': 'fixed-chunks-no-overlap-v1' if mode == 'live_replay' else 'full-file-v1'}
+        raise ValueError('allow_cloud must be a boolean.')
+    limit = value.get('sample_limit', 0)
+    if type(limit) is not int or not 0 <= limit <= 1000:
+        raise ValueError('Sample limit must be 0 (all) or 1–1000.')
+    return {'mode': mode, 'chunk_seconds': chunk, 'allow_cloud': cloud, 'sample_limit': limit,
+            'protocol': {'live_replay': 'fixed-chunks-no-overlap-v1',
+                'experiment2': 'app-qwen-realtime-packets-v1',
+                'experiment3': 'app-whisper-offline-v1'}.get(mode, 'full-file-v1')}
 
 
 def percentile(values, fraction=.95):
@@ -36,7 +41,7 @@ def replay(adapter, audio_path, language, chunk_seconds, cancelled=lambda: False
         total, offset = audio.getnframes(), 0
         while offset < total:
             if cancelled():
-                raise InterruptedError('Đã dừng giữa các đoạn LIVE mô phỏng; mẫu chưa được chấm.')
+                raise InterruptedError('Cancelled between simulated chunks; this sample has not been scored.')
             count = min(step, total - offset)
             started = clock()
             path = Path(temp) / 'chunk.wav'

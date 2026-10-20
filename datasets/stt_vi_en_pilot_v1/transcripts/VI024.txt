@@ -1,0 +1,7 @@
+Thưa thầy, fine-tuning có giúp model nghe tốt hơn các thuật ngữ trong ngành của con không ạ?
+
+Có thể. Domain adaptation giúp model thích nghi với dữ liệu cụ thể, nhưng hiệu quả vẫn cần được đo trên dữ liệu mới.
+
+Con có cần kiểm tra xem những kiểu nói khác bị giảm chất lượng không thầy?
+
+Có. Con cũng nên đo lại thời gian inference trên thiết bị dự định dùng trước khi quyết định triển khai.

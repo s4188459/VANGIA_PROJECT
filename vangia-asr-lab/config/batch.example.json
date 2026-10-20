@@ -1,0 +1,20 @@
+{
+  "model_id": "openai/whisper-small.en",
+  "backend": "faster-whisper",
+  "language": "en",
+  "mode": "batch_file",
+  "device": "cpu",
+  "precision": "int8",
+  "threads": 4,
+  "beam_size": 5,
+  "vad_filter": false,
+  "weights_path": "C:/ASR/weights/whisper-small.en",
+  "artifact_provenance": "C:/ASR/weights/whisper-small.en.provenance.json",
+  "dataset_manifest": "runs/datasets/split-development.json",
+  "dataset_id": "new_eng_dev",
+  "dataset_split": "development",
+  "out": "runs/batch-small-en",
+  "load_timeout_s": 1800,
+  "inference_timeout_s": 600,
+  "random_seed": 42
+}

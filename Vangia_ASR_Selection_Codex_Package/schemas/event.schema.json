@@ -1,0 +1,330 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vangia.local/schemas/asrlab-event-v2.json",
+  "title": "Vangia ASR Lab append-only event schema V2",
+  "description": "Strict envelope and typed, validated payload contract. Validate per-type payload and chronological/split relationship in separate semantic validator. Any synthetic fixture MUST tag provenance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "session_id",
+    "event_id",
+    "event_type",
+    "utc_iso8601",
+    "monotonic_ns",
+    "clock_id",
+    "source",
+    "payload",
+    "provenance_type",
+    "input_mode"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "audio_frame_captured",
+        "speech_segment_boundary",
+        "chunk_created",
+        "inference_queued",
+        "inference_started",
+        "inference_finished",
+        "inference_error",
+        "hypothesis_emitted",
+        "merge_applied",
+        "caption_rendered",
+        "caption_committed",
+        "offline_job_queued",
+        "offline_job_started",
+        "offline_job_finished",
+        "resource_sample",
+        "recording_gap",
+        "session_end",
+        "run_started",
+        "model_load_started",
+        "model_loaded",
+        "audio_capture_started",
+        "audio_capture_ended",
+        "speech_start",
+        "speech_end",
+        "chunk_ready",
+        "caption_update_requested",
+        "caption_paint_ack",
+        "caption_presentation_verified",
+        "audio_drop_detected",
+        "merge_revision",
+        "worker_clock_calibrated",
+        "model_health",
+        "reference_word_annotated",
+        "review_annotation_added",
+        "run_finished"
+      ]
+    },
+    "utc_iso8601": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "monotonic_ns": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "clock_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "microphone",
+        "system_loopback",
+        "combined",
+        "offline",
+        "ui",
+        "worker",
+        "telemetry",
+        "paced_replay",
+        "synthetic_fixture",
+        "dataset_importer"
+      ]
+    },
+    "trace_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "chunk_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "attempt_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "worker_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "audio_start_sample": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "audio_end_sample": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "sample_rate_hz": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "hypothesis_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "caption_text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "is_provisional": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "is_committed": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "model_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "checkpoint_revision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "config_sha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "payload": {
+      "type": "object",
+      "description": "Event-specific measured fields only; unknown is null with a missing_reason. Preserve full text in restricted artifact."
+    },
+    "missing_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "not_measured",
+        "not_applicable",
+        "clock_unsynchronized",
+        "no_reference_alignment",
+        "worker_crash",
+        "source_gap",
+        "unknown"
+      ]
+    },
+    "provenance_type": {
+      "type": "string",
+      "enum": [
+        "real_measurement",
+        "historical_import",
+        "simulated_fixture",
+        "derived_metric"
+      ]
+    },
+    "input_mode": {
+      "type": "string",
+      "enum": [
+        "historical_whole_file",
+        "batch_file",
+        "paced_replay",
+        "live_microphone",
+        "live_loopback",
+        "native_streaming",
+        "synthetic_fixture",
+        "none"
+      ]
+    },
+    "model_config_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "trace_quality": {
+      "type": "string",
+      "enum": [
+        "ground_truth",
+        "measured",
+        "clock_calibrated",
+        "paint_proxy",
+        "estimated",
+        "unknown"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "hypothesis_emitted"
+          }
+        },
+        "required": [
+          "event_type"
+        ]
+      },
+      "then": {
+        "required": [
+          "chunk_id",
+          "hypothesis_version",
+          "caption_text",
+          "model_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "caption_rendered"
+          }
+        },
+        "required": [
+          "event_type"
+        ]
+      },
+      "then": {
+        "required": [
+          "hypothesis_version",
+          "caption_text"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "chunk_created"
+          }
+        },
+        "required": [
+          "event_type"
+        ]
+      },
+      "then": {
+        "required": [
+          "chunk_id",
+          "audio_start_sample",
+          "audio_end_sample",
+          "sample_rate_hz"
+        ]
+      }
+    }
+  ],
+  "examples": [
+    {
+      "run_id": "r01",
+      "session_id": "s01",
+      "event_id": "e001",
+      "event_type": "chunk_created",
+      "utc_iso8601": "2026-10-15T12:40:00+07:00",
+      "monotonic_ns": 123456789000,
+      "clock_id": "host_monotonic_0",
+      "source": "worker",
+      "chunk_id": "chunk-0001",
+      "audio_start_sample": 0,
+      "audio_end_sample": 32000,
+      "sample_rate_hz": 16000,
+      "payload": {
+        "segmentation_policy": "fixed_window",
+        "hop_seconds": 2.0,
+        "overlap_seconds": 0.0
+      }
+    }
+  ]
+}

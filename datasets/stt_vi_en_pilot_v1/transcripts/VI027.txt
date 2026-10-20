@@ -1,0 +1,7 @@
+Thưa thầy, ở đoạn này model nghe đúng tiếng Việt nhưng làm sai tên thuật toán. Con nên sửa reference không ạ?
+
+Please listen to the original recording before changing the reference transcript.
+
+Nghĩa là con chỉ sửa khi reference không khớp audio, chứ không sửa để điểm model cao hơn đúng không thầy?
+
+Đúng rồi con. The reference must match what the speaker actually said, including repetitions and corrections.

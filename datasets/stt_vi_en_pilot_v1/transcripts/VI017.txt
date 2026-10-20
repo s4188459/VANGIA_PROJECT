@@ -1,0 +1,7 @@
+Thầy ơi, trước khi thử model phức tạp thì con có cần làm một baseline đơn giản không ạ?
+
+Có. Baseline giúp con biết phương pháp mới có thực sự cải thiện kết quả hay chỉ làm hệ thống phức tạp hơn.
+
+Trong benchmark, con sẽ cho mọi model nhận cùng dataset và dùng cùng cách chấm nhé thầy?
+
+Đúng rồi. Con cũng giữ cách chuẩn bị âm thanh nhất quán để việc so sánh có ý nghĩa.

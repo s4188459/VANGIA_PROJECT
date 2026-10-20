@@ -1,0 +1,7 @@
+Thưa thầy, accuracy cao có nghĩa là model phát hiện các trường hợp hiếm tốt không ạ?
+
+Không nhất thiết. Con cần xem thêm precision và recall để biết model báo nhầm và bỏ sót bao nhiêu.
+
+Nếu việc bỏ sót nguy hiểm hơn báo nhầm thì con nên chú ý recall nhiều hơn đúng không thầy?
+
+Đúng, nhưng con vẫn cần theo dõi cả hai. Mức đánh đổi phải phù hợp với mục đích sử dụng thực tế.

@@ -1,0 +1,7 @@
+Thưa thầy, tại sao model làm tốt trên bộ thử mà khi con dùng thật lại sai nhiều hơn ạ?
+
+The training data may not represent the people who use the application.
+
+Vậy con cần thử thêm giọng nói và điều kiện phòng khác nhau để kiểm tra đúng không thầy?
+
+Đúng rồi con. Keep the evaluation procedure consistent across all models.

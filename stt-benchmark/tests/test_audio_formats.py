@@ -54,7 +54,7 @@ class FormatTests(unittest.TestCase):
 
     def test_same_id_with_two_audio_extensions_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
-            with self.assertRaisesRegex(ValueError,'Trùng'):
+            with self.assertRaisesRegex(ValueError,'Duplicate'):
                 import_zip(make_zip({'EN001.mp3':b'a','EN001.wav':b'b','EN001.txt':'hello'}),Path(directory),'duplicate','en')
 
     def test_invalid_compressed_audio_names_sample_and_leaves_no_import(self):

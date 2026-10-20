@@ -35,7 +35,7 @@ def read_json(path):
 
 def import_zip(archive, destination, name, language):
     if language not in ("en", "vi"):
-        raise ValueError("Chọn ngôn ngữ en hoặc vi cho mỗi dataset.")
+        raise ValueError("Choose en or vi for each dataset.")
     destination = Path(destination)
     dataset_id = uuid.uuid4().hex
     folder = destination / dataset_id
@@ -43,11 +43,11 @@ def import_zip(archive, destination, name, language):
     with zipfile.ZipFile(archive) as bundle:
         infos = bundle.infolist()
         if len(infos) > 2500 or sum(x.file_size for x in infos) > MAX_EXPANDED:
-            raise ValueError("ZIP quá lớn: tối đa 2.500 mục và 1 GB sau giải nén.")
+            raise ValueError("ZIP exceeds limits: 2,500 entries and 1 GB uncompressed.")
         for entry in infos:
             path = PurePosixPath(entry.filename.replace("\\", "/"))
             if path.is_absolute() or ".." in path.parts or any(":" in p for p in path.parts):
-                raise ValueError("ZIP chứa đường dẫn không hợp lệ.")
+                raise ValueError("ZIP contains an invalid path.")
             if entry.is_dir() or "__MACOSX" in path.parts or path.name.startswith("."):
                 continue
             suffix = path.suffix.lower()
@@ -55,21 +55,21 @@ def import_zip(archive, destination, name, language):
                 continue
             sample_id = path.stem
             if not ID_PATTERN.fullmatch(sample_id):
-                raise ValueError(f"Tên mẫu không hợp lệ: {path.name}. Dùng chữ, số, _ hoặc -.")
+                raise ValueError(f"Invalid sample name: {path.name}. Use letters, digits, _ or -.")
             key = (sample_id.casefold(), 'audio' if suffix in AUDIO_EXTENSIONS else 'text')
             if key in seen:
-                raise ValueError(f"Trùng ID/file trong ZIP: {path.name}")
+                raise ValueError(f"Duplicate ID/file in ZIP: {path.name}")
             seen.add(key)
             if (suffix in AUDIO_EXTENSIONS and entry.file_size > MAX_AUDIO) or (suffix == ".txt" and entry.file_size > 100000):
-                raise ValueError(f"File quá lớn: {path.name}")
+                raise ValueError(f"File too large: {path.name}")
             (audio_entries if suffix in AUDIO_EXTENSIONS else reference_entries)[sample_id] = entry
         missing_text = sorted(audio_entries.keys() - reference_entries.keys())
         missing_audio = sorted(reference_entries.keys() - audio_entries.keys())
         if missing_text or missing_audio:
-            raise ValueError(f"Thiếu TXT: {', '.join(missing_text[:12]) or 'không'}. "
-                             f"Thiếu audio được hỗ trợ: {', '.join(missing_audio[:12]) or 'không'}. ID phải giống cả chữ hoa/thường.")
+            raise ValueError(f"Missing TXT: {', '.join(missing_text[:12]) or 'none'}. "
+                             f"Missing supported audio: {', '.join(missing_audio[:12]) or 'none'}. IDs must match exactly, including case.")
         if not audio_entries or len(audio_entries) > 1000:
-            raise ValueError("Dataset phải có từ 1 đến 1.000 cặp audio–TXT.")
+            raise ValueError("Dataset must contain 1–1,000 audio–TXT pairs.")
         samples = []
         digest = hashlib.sha256()
         digest.update(language.encode())
@@ -85,14 +85,14 @@ def import_zip(archive, destination, name, language):
                 reference = raw_reference.decode("utf-8-sig").replace("\r\n", "\n").replace("\r", "\n").strip()
                 words = normalize(reference).split()
                 if not words or len(words) > 3000:
-                    raise ValueError(f"{sample_id}: transcript cần 1–3.000 từ, mã hóa UTF-8.")
+                    raise ValueError(f"{sample_id}: transcript must contain 1–3,000 words encoded as UTF-8.")
                 try:
                     audio, duration, original_metadata = canonical_audio(original)
                 except Exception as exc:
                     raise ValueError(f"{sample_id}: {exc}") from exc
                 normalized_size += len(audio)
                 if normalized_size > MAX_EXPANDED:
-                    raise ValueError('Tổng audio sau giải mã vượt 1 GB; chia dataset thành các phần nhỏ hơn.')
+                    raise ValueError('Decoded audio exceeds 1 GB; split the dataset into smaller parts.')
                 audio_hash = hashlib.sha256(audio).hexdigest()
                 original_hash = hashlib.sha256(original).hexdigest()
                 reference_hash = hashlib.sha256(raw_reference).hexdigest()

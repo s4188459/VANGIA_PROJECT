@@ -1,0 +1,11 @@
+# Machine-local environments, credentials and generated caches
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.env
+**/.env.*
+!**/.env.example
+# Redundant source-package extraction and local input archive
+Vangia_ASR_Selection_Codex_Package/Vangia_ASR_Selection_Codex_Package/
+Vangia_ASR_Selection_Codex_Package/*.zip
+stt-benchmark/backups/

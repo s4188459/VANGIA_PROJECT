@@ -1,0 +1,5 @@
+{
+  "mode": "synthetic_fixture",
+  "out": "runs/fixture",
+  "random_seed": 42
+}

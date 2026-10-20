@@ -1,0 +1,7 @@
+Thầy ơi, hệ thống tạo embedding rồi lưu vào vector database để làm gì ạ?
+
+Nó giúp bước retrieval tìm những đoạn tài liệu có liên quan đến câu hỏi của người dùng.
+
+Vậy đoạn có biểu diễn gần nhất đã chắc chắn chứa đáp án đúng chưa thầy?
+
+Chưa chắc đâu con. Con vẫn cần kiểm tra nội dung nguồn và xem đoạn đó có thực sự trả lời câu hỏi hay không.

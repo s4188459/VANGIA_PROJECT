@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vangia-asr-lab"
+version = "0.2.0"
+description = "Local English ASR selection and auditable measurement lab"
+requires-python = ">=3.12"
+dependencies = ["jsonschema>=4.23,<5", "psutil>=6,<8", "av>=16,<20", "numpy>=1.26"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+capture = ["sounddevice>=0.5", "numpy>=1.26"]
+audio = ["av>=16,<20", "numpy>=1.26"]
+whisper = ["faster-whisper>=1.1"]
+
+[project.scripts]
+asrlab = "asrlab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+asrlab = ["resources/config/*.json", "resources/schemas/*.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

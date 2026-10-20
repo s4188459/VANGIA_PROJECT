@@ -1,6 +1,6 @@
 param(
   [Parameter(Mandatory=$true)]
-  [ValidateSet('faster-whisper','transformers-whisper','transformers-ctc','qwen-asr','nemo','sensevoice','vosk','elevenlabs','google-chirp')]
+  [ValidateSet('faster-whisper','transformers-whisper','transformers-ctc','qwen-asr','nemo','sensevoice','fun-asr-mlt','vosk','elevenlabs','google-chirp')]
   [string]$Backend
 )
 $ErrorActionPreference = 'Stop'
@@ -11,6 +11,7 @@ $packages = @{
   'qwen-asr' = @('qwen-asr')
   'nemo' = @('nemo_toolkit[asr]','huggingface_hub')
   'sensevoice' = @('funasr','torch','torchaudio','huggingface_hub')
+  'fun-asr-mlt' = @('funasr>=1.4.1','torch','torchaudio','transformers','tiktoken','huggingface_hub')
   'vosk' = @('vosk')
   'elevenlabs' = @('requests')
   'google-chirp' = @('google-cloud-speech')

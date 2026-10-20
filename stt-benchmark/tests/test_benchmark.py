@@ -62,7 +62,7 @@ class ScoringTests(unittest.TestCase):
         adapter = FasterWhisperAdapter(config())
         adapter.model = SimpleNamespace(model=SimpleNamespace(is_multilingual=False),
                                         transcribe=lambda *args, **kwargs: (iter(()), SimpleNamespace(language='en')))
-        with self.assertRaisesRegex(ValueError, 'đa ngôn ngữ'):
+        with self.assertRaisesRegex(ValueError, 'multilingual'):
             adapter.transcribe(Path('unused.wav'), 'vi')
     def test_configuration_rejects_fractional_boolean_and_null_values(self):
         for changes in ({'beam_size':1.5}, {'cpu_threads':True}, {'model':None}, {'label':None}, {'vad_filter':'false'}):
@@ -115,7 +115,7 @@ class DatasetTests(unittest.TestCase):
         self.assertEqual((self.root/dataset['id']/'transcripts/VI001.txt').read_text(encoding='utf-8'), reference)
         self.assertEqual((self.root/dataset['id']/'audio/VI001.wav').read_bytes(), wav_bytes())
     def test_unpaired_rejected(self):
-        with self.assertRaisesRegex(ValueError, 'Thiếu TXT'):
+        with self.assertRaisesRegex(ValueError, 'Missing TXT'):
             import_zip(make_zip({'EN001.wav':wav_bytes()}), self.root, 'missing', 'en')
     def test_duplicates_and_traversal_rejected(self):
         for entries in ({'x/EN001.wav':wav_bytes(), 'y/en001.wav':wav_bytes()},
@@ -200,7 +200,7 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(run['models'][0]['summary']['failed'], 1)
     def test_vietnamese_rejects_english_only_model(self):
         dataset = import_zip(make_zip(),self.root/'datasets','vi','vi')
-        with self.assertRaisesRegex(ValueError,'đa ngôn ngữ'):
+        with self.assertRaisesRegex(ValueError,'multilingual'):
             self.runner.start(dataset['id'],[validate_config({'label':'en','model':'small.en'})])
     def test_cancellation_between_samples(self):
         entered, release = threading.Event(), threading.Event()

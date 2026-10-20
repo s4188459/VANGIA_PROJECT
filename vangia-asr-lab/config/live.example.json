@@ -1,0 +1,20 @@
+{
+  "model_id": "openai/whisper-small.en",
+  "backend": "faster-whisper",
+  "language": "en",
+  "mode": "live_microphone",
+  "device": "cpu",
+  "precision": "int8",
+  "threads": 4,
+  "weights_path": "C:/ASR/weights/whisper-small.en",
+  "artifact_provenance": "C:/ASR/weights/whisper-small.en.provenance.json",
+  "capture_consent_record_id": "",
+  "capture_device": null,
+  "capture_duration_s": 60,
+  "session_id": "new-session-001",
+  "speaker_id": "speaker-001",
+  "chunk_seconds": 2,
+  "overlap_seconds": 0,
+  "out": "runs/live-small-en",
+  "random_seed": 42
+}

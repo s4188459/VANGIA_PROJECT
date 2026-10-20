@@ -1,0 +1,89 @@
+{
+  "date": "2026-10-17",
+  "timezone": "Asia/Bangkok",
+  "version": "0.2.0",
+  "tests": {
+    "passed": 95,
+    "failed": 0,
+    "skipped": 0,
+    "duration_s": 63.69,
+    "native_ui": true,
+    "command": "$env:ASRLAB_TEST_UI='1'; ./.venv/Scripts/python.exe -m pytest -q --basetemp .verification-release02-20261017 -p no:cacheprovider"
+  },
+  "earlier_verification_interruptions": [
+    "2026-10-16 automatic approval could not complete due to usage limit; later retry approved",
+    "2026-10-17 one initial Tcl progress.tcl initialization failure; file subsequently present, isolated retry and full suite passed"
+  ],
+  "normative_parity": {
+    "docs/BASELINE_FACTS.md": true,
+    "docs/EXPERIMENT_PROTOCOL.md": true,
+    "docs/IMPLEMENTATION_CONTRACT.md": true,
+    "docs/METRIC_DICTIONARY.md": true,
+    "docs/RESEARCH_EVIDENCE_AND_REQUIREMENTS.md": true,
+    "config/experiment_matrix.json": true,
+    "config/model_registry.json": true,
+    "config/provisional_gates.json": true,
+    "schemas/event.schema.json": true,
+    "schemas/reviewer_annotation.schema.json": true,
+    "schemas/run_manifest.schema.json": true
+  },
+  "bundle_validation": {
+    "ok": true,
+    "errors": [],
+    "scope": "bundle schema, integrity, row/score parity; not model validation"
+  },
+  "real_smoke": {
+    "model_id": "openai/whisper-small.en",
+    "planned": 3,
+    "completed": 3,
+    "normalized_wer_micro": 0.06875,
+    "normalized_cer": 0.028871391076115485,
+    "rtf": 0.20497666197436518,
+    "peak_worker_rss_bytes": 707817472
+  },
+  "wheel_smoke": {
+    "bundled_resources_used": true,
+    "models": 11,
+    "zip_samples": 3,
+    "export_samples": 3,
+    "export_valid": true
+  },
+  "source_hashes": {
+    "src/asrlab/__init__.py": "c8adb24e4ba762b5e2550e5ef081ba7cb1f02dc174026333ba3f58247d5d191f",
+    "src/asrlab/__main__.py": "79ee6f134c5c5193377cf9b189cbdcc3e2095e49ba9cec310114441c15a917c4",
+    "src/asrlab/adapters.py": "4fae83c09b488137fc9f35481371b83df73b190f2b9b42132bc86bf62e44165a",
+    "src/asrlab/analysis_export.py": "b60a6993dffa59b2480f2a2a667917041a7d2902b92ee9a13a61a4c336bdc437",
+    "src/asrlab/audio.py": "369aa4220c9016dce847660a1ed74f1deb0012444f5e780ab66c86cf5a330776",
+    "src/asrlab/benchmark.py": "e096f63e984979b526d83f2d9739b59714aeb72a7d6fd43d01db0593def286d3",
+    "src/asrlab/benchmark_ui.py": "b1bf01a8d01166bc3df77c22f5eb3d52fbc90a89d235f1e537537f2454ed2728",
+    "src/asrlab/cli.py": "eb2d74a7b6fe9e8086006dc948af17cbfb0c4207d6dd79b9d70e41903fe818d4",
+    "src/asrlab/common.py": "5e30782e1666a5f2cbaebb2df0a5200686190f87bd4c3ca7b28495ff1f567e2f",
+    "src/asrlab/datasets.py": "ef4e9d80c273183ffcbd764735765be6db023bf3d74c8855b3aa7584f2999309",
+    "src/asrlab/diagnostic.py": "c40a42fbf3d7bc0416ba2f17def938041a6c0190fd96ca0ed7c2ba0a011e5563",
+    "src/asrlab/events.py": "3a665b33181baca058ce6dfa3536d89859c60dd4117727cc7e20b5365d67fa7c",
+    "src/asrlab/experiments.py": "a07e8a4328fb4472d23f14b3c9edc6463e19a9ccd8d52d22bef9a9c99b5b88b4",
+    "src/asrlab/governance.py": "f3c45dbcb4e2b6bd88b6361cf5519cbd96810da53bd900922a0f122073615d1e",
+    "src/asrlab/legacy.py": "d7d1bcb5c402b9e6a3f5aa11a41d4312f47568fbd990849827db48d03a98e2f9",
+    "src/asrlab/legacy_audio.py": "44e1c1d5165c0ff86b6b09935a146a4741767c5ab11f0d8e76e45a48ed8b4f46",
+    "src/asrlab/metrics.py": "331b9f32814306ab349191337fcfa491c3b100b42fe263f489567264289c7880",
+    "src/asrlab/privacy.py": "e122d5bab3c802720aaa2a87894a990126fbe82f44b412149c868ab142fb60eb",
+    "src/asrlab/reports.py": "b320d67bc762f294377cb1353b86b469b096c5a61b013d33d7bf3a1da339c437",
+    "src/asrlab/review.py": "df22d76727c596a89dd3f535842c8f90fda1bf6d16c07de5060c8f9b5d294894",
+    "src/asrlab/runner.py": "403d345253b8079874daab6876ebe850fd4978ee79a3c088f773df72617fed92",
+    "src/asrlab/storage.py": "9ad5c112ed7246d135ad75aa1106d4347482c787545b6986b5150199c33b021e",
+    "src/asrlab/study.py": "3c211bfde4a90fc47edabaa24220f23e79dc162e0b04f2608980319b980f9d10",
+    "src/asrlab/timing.py": "b5abf0554fa65cccf389b8161a7316d2adf9ece1cfbfbe5294bf9fc6211dce05",
+    "src/asrlab/ui.py": "35e0c5a45f70fd7e93e73ca53cd3ccd59339d1f35a9ac432b260914d5de2ba67",
+    "src/asrlab/workbench.py": "f975e548afb6d69de00b4143af6573f8cb6968c204c1c79d6559c8bf8a55a068",
+    "src/asrlab/worker.py": "e2d3fecc5fdf0725b04683b80ce5447c299c62fefa72f9dd43b5fc325b9c6b7b",
+    "src/asrlab/worker_client.py": "f16347eec5054f43ec2c9211ab90452f8d58182a42127fba04f0594e7d86ed20",
+    "src/asrlab/zip_dataset.py": "b898b4821f3ae0f4c8b4e9c7c95f522192fa7e22f003d5aaa6597806403ab032"
+  },
+  "limitations": [
+    "No true warm worker reuse",
+    "Independent chunk replay is not native streaming",
+    "Cross-import dataset leakage requires external global governance",
+    "No measured word-to-physical-display latency",
+    "Only local small.en smoke empirically tested; no all-model campaign or user study"
+  ]
+}

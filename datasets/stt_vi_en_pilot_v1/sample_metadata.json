@@ -1,0 +1,487 @@
+[
+  {
+    "id": "VI001",
+    "group": "Tiếng Việt",
+    "topic": "Lập kế hoạch học",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI002",
+    "group": "Tiếng Việt",
+    "topic": "Hướng dẫn nộp bài",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI003",
+    "group": "Tiếng Việt",
+    "topic": "Quan sát và kết luận",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI004",
+    "group": "Tiếng Việt",
+    "topic": "Thử nghiệm có kiểm soát",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI005",
+    "group": "Tiếng Việt",
+    "topic": "Chất lượng âm thanh",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI006",
+    "group": "Tiếng Việt",
+    "topic": "Giải thích kết quả",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI007",
+    "group": "Tiếng Việt",
+    "topic": "Lịch họp",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI008",
+    "group": "Tiếng Việt",
+    "topic": "Chỉ đường",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI009",
+    "group": "Tiếng Việt",
+    "topic": "Mua thiết bị",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI010",
+    "group": "Tiếng Việt",
+    "topic": "Sửa lời nói",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI011",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Mục tiêu bài toán",
+    "target_terms": [
+      "input",
+      "output",
+      "classification",
+      "regression"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI012",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Chia dữ liệu",
+    "target_terms": [
+      "training set",
+      "validation set",
+      "test set"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI013",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Quá khớp",
+    "target_terms": [
+      "training loss",
+      "validation loss",
+      "overfitting",
+      "regularization"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI014",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Tốc độ học",
+    "target_terms": [
+      "learning rate",
+      "gradient descent",
+      "loss"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI015",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Từ gần âm",
+    "target_terms": [
+      "batch size",
+      "epoch",
+      "learning rate"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI016",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Chỉ số phân loại",
+    "target_terms": [
+      "accuracy",
+      "precision",
+      "recall"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI017",
+    "group": "Việt xen thuật ngữ",
+    "topic": "So sánh mô hình",
+    "target_terms": [
+      "baseline",
+      "benchmark",
+      "dataset"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI018",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Chữ viết tắt phần cứng",
+    "target_terms": [
+      "CPU",
+      "GPU",
+      "RAM"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI019",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Giao tiếp ứng dụng",
+    "target_terms": [
+      "API",
+      "JSON",
+      "request",
+      "response"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI020",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Phiên âm trực tiếp",
+    "target_terms": [
+      "latency",
+      "streaming",
+      "buffer",
+      "chunk"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI021",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Bản chữ cuối cùng",
+    "target_terms": [
+      "transcript",
+      "timestamp",
+      "subtitle"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI022",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Chấm nhận dạng",
+    "target_terms": [
+      "WER",
+      "CER",
+      "reference",
+      "prediction"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI023",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Tiếp tục sau gián đoạn",
+    "target_terms": [
+      "checkpoint",
+      "cache",
+      "resume"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI024",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Tinh chỉnh theo lĩnh vực",
+    "target_terms": [
+      "fine-tuning",
+      "domain adaptation",
+      "inference"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI025",
+    "group": "Việt xen thuật ngữ",
+    "topic": "Tìm kiếm tài liệu",
+    "target_terms": [
+      "embedding",
+      "vector database",
+      "retrieval"
+    ],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI026",
+    "group": "Chuyển câu Việt–Anh",
+    "topic": "Yêu cầu sản phẩm",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI027",
+    "group": "Chuyển câu Việt–Anh",
+    "topic": "Phân tích lỗi",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI028",
+    "group": "Chuyển câu Việt–Anh",
+    "topic": "Độ trễ trực tiếp",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI029",
+    "group": "Chuyển câu Việt–Anh",
+    "topic": "Thuật ngữ trong ngữ cảnh",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  },
+  {
+    "id": "VI030",
+    "group": "Chuyển câu Việt–Anh",
+    "topic": "Quyết định sau benchmark",
+    "target_terms": [],
+    "reference_status": "draft_not_audio_verified",
+    "format": "dialogue",
+    "speakers": [
+      "Con",
+      "Thầy"
+    ],
+    "turns": 4,
+    "script_version": "2-dialogue"
+  }
+]

@@ -1,0 +1,7 @@
+Thầy ơi, trước khi chọn model thì con cần xác định input và output như thế nào ạ?
+
+Con hãy mô tả dữ liệu đưa vào và kết quả cần nhận được. Nếu output là một nhóm thì có thể dùng classification.
+
+Còn nếu con cần dự đoán một giá trị liên tục thì đó là regression đúng không thầy?
+
+Đúng rồi. Con xác định rõ bài toán trước, rồi mới chọn model và cách đánh giá phù hợp.

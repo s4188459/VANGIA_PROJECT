@@ -20,6 +20,81 @@ function harness() {
 }
 const result = (id,status='completed') => ({id,status,message:id,dataset:{name:id,language:'en',samples:[]},models:[],total_tasks:0,completed_tasks:0,common_sample_count:0});
 const tick = () => new Promise(resolve=>setImmediate(resolve));
+
+test('retired automatic model experiments cannot be submitted from the web UI', async()=>{
+  for (const mode of ['experiment2','experiment3']) {
+    const h=harness(); await tick();
+    h.run(`state.datasets=[{id:'english',language:'en'}];
+      $('dataset').value='english'; $('reviewed').checked=true;
+      $('model-scope').value='manual'; $('benchmark-mode').value='${mode}';
+      $('sample-limit').value='3';
+      globalThis.sent=null;
+      fetch=async(path,options)=>{globalThis.sent={path,body:JSON.parse(options.body)}; throw new Error('request captured');};`);
+    await h.elements.get('run').onclick();
+    assert.equal(h.run('sent'),null);
+    assert.match(h.elements.get('notice').textContent,/retired/);
+  }
+});
+test('Vietnamese sets use only members and CPU defaults, never unrelated saved models', async()=>{
+  const h=harness(); await tick();
+  h.run(`state.datasets=[{id:'vi',language:'vi'}];
+    state.catalog=[{label:'small',model:'small',backend:'faster-whisper',languages:['en','vi'],sets:['vi-live']},
+      {label:'large',model:'large-v3',backend:'faster-whisper',languages:['en','vi'],sets:['vi-video']}];
+    state.models=[{label:'custom CUDA',model:'small',backend:'faster-whisper',device:'cuda',compute_type:'float16'},
+      {label:'unrelated',model:'tiny',backend:'faster-whisper',languages:['en','vi']}];
+    state.backends={'faster-whisper':{installed:true}};`);
+  h.elements.get('dataset').value='vi'; h.elements.get('model-scope').value='vi-live';
+  h.elements.get('model-scope').onchange();
+  assert.equal(h.run('batchModels().models.length'),1);
+  assert.equal(h.run('batchModels().models[0].model'),'small');
+  assert.equal(h.run('batchModels().models[0].device'),'cpu');
+  assert.equal(h.run('batchModels().models[0].compute_type'),'int8');
+  assert.equal(h.run('batchModels().models[0].allow_download'),false);
+  assert.equal(h.elements.get('benchmark-mode').value,'live_replay');
+  assert.equal(h.elements.get('chunk-seconds').value,'1');
+  h.elements.get('model-scope').value='vi-video'; h.elements.get('model-scope').onchange();
+  assert.equal(h.run('batchModels().models[0].model'),'large-v3');
+  assert.equal(h.elements.get('benchmark-mode').value,'final');
+});
+
+test('Vietnamese set refuses English datasets and shows missing backends',async()=>{
+  const h=harness();await tick();
+  h.run(`state.datasets=[{id:'ds',language:'en'}];
+    state.catalog=[{label:'MLT',model:'FunAudioLLM/Fun-ASR-MLT-Nano-2512',backend:'fun-asr-mlt',languages:['en','vi'],sets:['vi-live']}];
+    state.backends={'fun-asr-mlt':{installed:false}};`);
+  h.elements.get('dataset').value='ds';h.elements.get('model-scope').value='vi-live';
+  assert.equal(h.run('batchModels().models.length'),0);
+  assert.match(h.run('batchModels().skipped.join()'),/Vietnamese/);
+  h.run("state.datasets[0].language='vi'");
+  assert.equal(h.run('batchModels().models.length'),0);
+  assert.match(h.run('batchModels().skipped.join()'),/not installed/);
+});
+test('resume is shown only for interrupted runs and follows background activity',async()=>{
+  const h=harness();await tick();
+  for (const status of ['completed','running','cancelled','interrupted']) {
+    const show=h.run("showRun('old')");
+    h.pending.get('/api/runs/old')(result('old',status));await show;
+    assert.equal(h.elements.get('resume').hidden,status!=='interrupted');
+  }
+  h.run("state.runs.push({id:'background',status:'running'}); updateRunButton()");
+  assert.equal(h.elements.get('resume').disabled,true);
+  h.run("state.runs.find(r=>r.id==='background').status='completed'; updateRunButton()");
+  assert.equal(h.elements.get('resume').disabled,false);
+});
+
+test('resume button posts existing run and refreshes its progress',async()=>{
+  const h=harness();await tick();
+  const show=h.run("showRun('old')");
+  h.pending.get('/api/runs/old')(result('old','interrupted'));await show;
+  const click=h.elements.get('resume').onclick();
+  assert.equal(h.elements.get('resume').disabled,true);
+  assert.ok(h.pending.has('/api/resume'));
+  h.pending.get('/api/resume')(result('old','running'));await tick();
+  h.pending.get('/api/runs/old')(result('old','running'));await click;
+  assert.equal(h.run('currentRun.id'),'old');
+  assert.equal(h.elements.get('resume').hidden,true);
+  assert.equal(h.elements.get('cancel').hidden,false);
+});
 test('late response from old report cannot replace newly selected report',async()=>{
   const h=harness();await tick();
   const old=h.run("showRun('old')");const next=h.run("showRun('new')");

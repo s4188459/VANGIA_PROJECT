@@ -1,0 +1,7 @@
+Thầy ơi, con đang dùng batch size nhỏ vì máy không đủ bộ nhớ. Như vậy có ảnh hưởng nhiều không ạ?
+
+Có thể ảnh hưởng đến tốc độ và quá trình học. Nhưng tăng batch size không bảo đảm mỗi epoch sẽ nhanh hơn trong mọi trường hợp.
+
+Vậy lần thử này con giữ learning rate cố định và chỉ đổi batch size thôi nhé thầy?
+
+Đúng rồi. Con ghi lại thời gian mỗi epoch và chất lượng để so sánh rõ hơn.

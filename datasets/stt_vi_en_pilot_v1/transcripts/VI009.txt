@@ -1,0 +1,7 @@
+Thưa thầy, chương trình của con chạy chậm quá. Con có nên mua máy mới luôn không ạ?
+
+Con chưa cần quyết định ngay. Trước hết, hãy đo thời gian từng bước để biết phần nào chậm nhất.
+
+Nếu chỉ một bước nhỏ làm mất nhiều thời gian thì con sửa phần đó trước nhé thầy?
+
+Đúng. Sau khi đo lại, con mới có cơ sở để biết nâng cấp máy có thực sự cần thiết hay không.

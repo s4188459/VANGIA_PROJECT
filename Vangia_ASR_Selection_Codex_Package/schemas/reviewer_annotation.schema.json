@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vangia.local/schemas/asrlab-annotation-v1.json",
+  "title": "Human-reviewed ASR error annotation",
+  "type": "object",
+  "required": [
+    "annotation_id",
+    "run_id",
+    "sample_id",
+    "reference_revision",
+    "reviewer_id",
+    "category",
+    "severity",
+    "review_status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "annotation_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "sample_id": {
+      "type": "string"
+    },
+    "reference_revision": {
+      "type": "string"
+    },
+    "reviewer_id": {
+      "type": "string"
+    },
+    "adjudicator_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "start_sample": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "end_sample": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "reference_span": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hypothesis_span": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "category": {
+      "enum": [
+        "term",
+        "negation",
+        "number",
+        "unit",
+        "speaker_turn",
+        "whole_turn_omission",
+        "chunk_seam_omission",
+        "chunk_seam_duplicate",
+        "silence_hallucination",
+        "substitution",
+        "deletion",
+        "insertion",
+        "other"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "cosmetic",
+        "minor",
+        "material_meaning_change",
+        "critical",
+        "uncertain"
+      ]
+    },
+    "review_status": {
+      "enum": [
+        "proposed",
+        "first_review",
+        "second_review",
+        "adjudicated"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sample_rate": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "confidence": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    }
+  }
+}

@@ -1,17 +1,19 @@
 const $ = id => document.getElementById(id);
 let state = {datasets: [], models: [], runs: []};
 let currentRun = null, polling = null, selectedModels = new Set(), currentDatasetId = '';
-let reportRequest = 0, backgroundPoll = null;
+let reportRequest = 0, backgroundPoll = null, resumePending = false;
 const activeStatus = status => ['running', 'cancelling'].includes(status);
 const pct = n => n == null ? '—' : `${(n * 100).toFixed(2)}%`;
 const seconds = n => `${n.toFixed(1)} s`;
-const statusText = s => ({running:'Đang chạy',cancelling:'Đang dừng',loading:'Đang nạp',queued:'Đang chờ',completed:'Hoàn tất',completed_with_errors:'Hoàn tất, có lỗi',cancelled:'Đã dừng',error:'Lỗi',interrupted:'Bị gián đoạn'})[s] || s;
+const statusText = s => ({running:'Running',cancelling:'Cancelling',loading:'Loading',queued:'Queued',completed:'Completed',completed_with_errors:'Completed with errors',cancelled:'Cancelled',error:'Error',interrupted:'Interrupted'})[s] || s;
 function node(tag, text, cls) { const el = document.createElement(tag); if (text != null) el.textContent = text; if (cls) el.className = cls; return el; }
 function notice(text, error = false) { $('notice').textContent = text; $('notice').className = error ? 'error' : ''; $('notice').hidden = !text; }
 async function api(path, options) { const r = await fetch(path, options); const value = await r.json(); if (!r.ok) throw new Error(value.error || `HTTP ${r.status}`); return value; }
 const post = (path, data) => api(path, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
 function updateRunButton() {
-  $('run').disabled = state.runs.some(r => activeStatus(r.status));
+  const busy = resumePending || state.runs.some(r => activeStatus(r.status));
+  $('run').disabled = busy;
+  $('resume').disabled = busy;
 }
 function watchBackgroundRun() {
   clearTimeout(backgroundPoll);
@@ -31,12 +33,12 @@ function option(value, text) { const el = node('option', text); el.value = value
 async function refresh() {
   state = await api('/api/state');
   const oldDataset = $('dataset').value;
-  $('dataset').replaceChildren(option('', 'Chọn dataset'));
-  state.datasets.forEach(d => $('dataset').append(option(d.id, `${d.name} · ${d.samples.length} mẫu`)));
+  $('dataset').replaceChildren(option('', 'Select dataset'));
+  state.datasets.forEach(d => $('dataset').append(option(d.id, `${d.name} · ${d.samples.length} samples`)));
   $('dataset').value = state.datasets.some(d => d.id === oldDataset) ? oldDataset : state.datasets[0]?.id || '';
   const oldRun = $('history').value;
-  $('history').replaceChildren(option('', 'Chọn lần chạy'));
-  state.runs.forEach(r => $('history').append(option(r.id, `${new Date(r.created_at).toLocaleString('vi-VN')} · ${r.dataset_name}`)));
+  $('history').replaceChildren(option('', 'Select run'));
+  state.runs.forEach(r => $('history').append(option(r.id, `${new Date(r.created_at).toLocaleString('en-US')} · ${r.dataset_name}`)));
   $('history').value = oldRun;
   renderModels();
   renderCatalog();
@@ -45,11 +47,11 @@ async function refresh() {
 }
 function renderModels() {
   $('model-list').replaceChildren();
-  if (!state.models.length) $('model-list').append(node('p', 'Thêm đường dẫn model local để bắt đầu.', 'hint'));
+  if (!state.models.length) $('model-list').append(node('p', 'Add a local model path to get started.', 'hint'));
   state.models.forEach(model => {
     const label = node('label', null, 'model-choice'); const input = node('input'); input.type = 'checkbox'; input.checked = selectedModels.has(model.label);
     input.onchange = () => { if (input.checked) selectedModels.add(model.label); else selectedModels.delete(model.label); };
-    const body = node('span', model.label); body.append(node('small', `${model.backend} · ${model.device.toUpperCase()} ${model.compute_type} · ${(model.languages || (model.model.endsWith('.en') || model.model.endsWith('-en') ? ['en'] : ['en','vi'])).join('/')} ${model.python_executable ? '· Python riêng' : state.backends?.[model.backend]?.installed === false ? '· thiếu thư viện' : ''}`));
+    const body = node('span', model.label); body.append(node('small', `${model.backend} · ${model.device.toUpperCase()} ${model.compute_type} · ${(model.languages || (model.model.endsWith('.en') || model.model.endsWith('-en') ? ['en'] : ['en','vi'])).join('/')} ${model.python_executable ? '· Separate Python environment' : state.backends?.[model.backend]?.installed === false ? '· missing dependencies' : ''}`));
     label.title = model.model; label.append(input, body); $('model-list').append(label);
   });
 }
@@ -65,7 +67,9 @@ function batchModels() {
   const dataset = state.datasets.find(d => d.id === $('dataset').value);
   const scope = $('model-scope').value || 'manual', skipped = [];
   if (scope === 'manual') return {models:state.models.filter(m=>selectedModels.has(m.label)), skipped};
-  if (!dataset) return {models:[], skipped:['Chọn dataset trước.']};
+  if (!dataset) return {models:[], skipped:['Select a dataset first.']};
+  const curated = ['vi-video','vi-live'].includes(scope);
+  if (curated && dataset.language !== 'vi') return {models:[], skipped:['Select a Vietnamese dataset containing reviewed Vietnamese-English speech.']};
   const language = m => {
     const known = (state.catalog || []).find(p=>p.backend===m.backend && p.model===m.model);
     const name = m.model.replaceAll('\\','/').split('/').pop();
@@ -74,14 +78,26 @@ function batchModels() {
   const models = [];
   function add(m) {
     if (!language(m).includes(dataset.language)) return;
-    if (['elevenlabs','google-chirp'].includes(m.backend) && !$('cloud-consent').checked) { skipped.push(`${m.label}: chưa cho phép cloud`); return; }
-    if (!m.python_executable && state.backends?.[m.backend]?.installed === false) { skipped.push(`${m.label}: thiếu backend`); return; }
+    if (state.backends?.[m.backend]?.import_checked === false) { skipped.push(`${m.label}: backend import failed; check configuration`); return; }
+    if (['elevenlabs','google-chirp'].includes(m.backend) && state.backends?.[m.backend]?.credentials === false) { skipped.push(`${m.label}: cloud credentials not configured`); return; }
+    if (['elevenlabs','google-chirp'].includes(m.backend) && !$('cloud-consent').checked) { skipped.push(`${m.label}: cloud uploads not authorized`); return; }
+    if (!m.python_executable && state.backends?.[m.backend]?.installed === false) { skipped.push(`${m.label}: backend not installed`); return; }
     models.push(m);
+  }
+  if (curated) {
+    (state.catalog || []).filter(p => p.sets?.includes(scope)).forEach(p => {
+      const fw = p.backend === 'faster-whisper';
+      add({...p, label:`${p.label} [${scope}]`, device:'cpu', compute_type:fw?'int8':'float32',
+        beam_size:fw || p.backend==='transformers-whisper'?5:1, cpu_threads:4, vad_filter:fw,
+        allow_download:$('batch-download').checked === true,
+        python_executable:state.backends?.[p.backend]?.python_executable || ''});
+    });
+    return {models, skipped};
   }
   state.models.forEach(add);
   if (scope === 'catalog') (state.catalog || []).forEach(p => {
     // Prefer saved configurations, including local faster-whisper checkpoint paths.
-    const equivalent = m => m.backend===p.backend && (m.model===p.model ||
+    const equivalent = m => m.backend===p.backend && (m.model===p.model || (p.backend==='vosk' && m.model.replaceAll('\\','/').split('/').pop()===p.model) ||
       (p.backend==='faster-whisper' && m.model.replaceAll('\\','/').split('/').pop()===`faster-whisper-${p.model.replaceAll('.','-')}`));
     if (state.models.some(equivalent)) return;
     const fw = p.backend==='faster-whisper';
@@ -97,9 +113,22 @@ function renderBatchPlan() {
   const scope = $('model-scope').value || 'manual';
   if (scope==='manual') { $('batch-plan').textContent=''; return; }
   const plan=batchModels();
-  $('batch-plan').textContent=`Sẽ thử ${plan.models.length} cấu hình phù hợp ngôn ngữ dataset. Model từ danh mục dùng CPU mặc định; cấu hình đã lưu giữ nguyên. ${plan.skipped.length ? `Bỏ qua ${plan.skipped.length}: ${plan.skipped.join('; ')}.` : ''}`;
+  if (['vi-video','vi-live'].includes(scope)) {
+    const members = (state.catalog || []).filter(p => p.sets?.includes(scope));
+    $('batch-plan').textContent = `${scope==='vi-video'?'Video: whole-file evaluation.':'Live screening: run once at 1 second, then again at 2 seconds. This is a simulation, not microphone latency.'} ${plan.models.length}/${members.length} candidates ready for an attempt. One CPU baseline per model; saved configurations are not used. ` +
+      members.map(p => `${p.label}: ${p.weight_status || 'Weights checked at load'}`).join('; ') +
+      (plan.skipped.length ? ` Skipped: ${plan.skipped.join('; ')}.` : '');
+    return;
+  }
+  $('batch-plan').textContent=`Will try ${plan.models.length} configurations matching the dataset language. Catalog presets use CPU defaults; saved configurations keep their settings. ${plan.skipped.length ? `Skipped ${plan.skipped.length}: ${plan.skipped.join('; ')}.` : ''}`;
 }
-$('model-scope').onchange = renderBatchPlan;
+$('model-scope').onchange = () => {
+  const scope = $('model-scope').value;
+  if (scope === 'vi-video') $('benchmark-mode').value = 'final';
+  if (scope === 'vi-live') { $('benchmark-mode').value = 'live_replay'; $('chunk-seconds').value = '1'; }
+  $('benchmark-mode').disabled = ['vi-video','vi-live'].includes(scope);
+  renderBatchPlan();
+};
 $('batch-download').onchange = renderBatchPlan;
 $('cloud-consent').onchange = renderBatchPlan;
 function catalogNote() { $('catalog-note').textContent = chosenPreset()?.note || ''; }
@@ -110,7 +139,7 @@ function backendControls(reset = true) {
   if (reset) { $('compute').value = fw ? 'int8' : 'float32'; $('vad').checked = fw; $('beam').value = beam ? '5' : '1'; }
   const info = state.backends?.[backend];
   if (reset) $('backend-python').value = info?.python_executable || '';
-  $('backend-note').textContent = info ? (info.python_executable ? 'Có môi trường Python riêng. Chưa xác minh mọi checkpoint/GPU; xem QA_REPORT để biết phạm vi đã thử.' : `${info.note} ${info.installed ? '' : `Từ workspace chạy: .\\stt-benchmark\\install-backend.ps1 -Backend ${backend}`}`) : '';
+  $('backend-note').textContent = info ? (info.python_executable ? `Separate Python environment. ${info.note} See QA_REPORT for tested checkpoints.` : `${info.note} ${info.installed ? '' : `Run from the workspace: .\\stt-benchmark\\install-backend.ps1 -Backend ${backend}`}`) : '';
 }
 $('backend').onchange = () => backendControls();
 $('catalog-language').onchange = renderCatalog;
@@ -121,7 +150,7 @@ $('use-preset').onclick = () => {
   $('model-label').value = preset.label; $('model-path').value = preset.model;
   $('model-languages').value = preset.languages.join(',');
   $('download').checked = false; $('model-details').open = true;
-  notice('Đã điền cấu hình. Kiểm tra thiết bị, đường dẫn/quyền tải rồi bấm Lưu cấu hình.');
+  notice('Preset filled in. Review the device, model path and download permission, then save the configuration.');
 };
 async function renderDataset() {
   renderBatchPlan();
@@ -130,7 +159,7 @@ async function renderDataset() {
   currentDatasetId = dataset?.id || '';
   if (changed) $('reviewed').checked = false;
   $('preview').hidden = !dataset;
-  $('dataset-meta').textContent = dataset ? `${dataset.language.toUpperCase()} · ${dataset.samples.length} cặp hợp lệ · ${(dataset.duration_s/60).toFixed(1)} phút` : '';
+  $('dataset-meta').textContent = dataset ? `${dataset.language.toUpperCase()} · ${dataset.samples.length} valid pairs · ${(dataset.duration_s/60).toFixed(1)} min` : '';
   if (!dataset) { $('audio').removeAttribute('src'); return; }
   const oldSample = $('sample').value;
   $('sample').replaceChildren(...dataset.samples.map(s => option(s.id, `${s.id} · ${seconds(s.duration_s)}`)));
@@ -149,15 +178,15 @@ $('dataset').onchange = () => renderDataset().catch(e => notice(e.message, true)
 $('sample').onchange = () => preview().catch(e => notice(e.message, true));
 $('upload-form').onsubmit = async event => {
   event.preventDefault(); const file = $('zip').files[0]; if (!file) return;
-  if (file.size > 512 * 1024 * 1024) return notice('ZIP tối đa 512 MB.', true);
-  $('upload').disabled = true; $('upload').textContent = 'Đang nhập & kiểm tra…'; notice('');
+  if (file.size > 512 * 1024 * 1024) return notice('Maximum ZIP size: 512 MB.', true);
+  $('upload').disabled = true; $('upload').textContent = 'Importing & validating…'; notice('');
   try {
     const query = new URLSearchParams({name: $('dataset-name').value, language: $('language').value});
     const dataset = await api(`/api/datasets?${query}`, {method:'POST', headers:{'Content-Type':'application/zip'}, body:file});
     await refresh(); $('dataset').value = dataset.id; await renderDataset(); $('upload-details').open = false;
-    notice(`Đã nhập ${dataset.samples.length} cặp hợp lệ. Nghe và kiểm tra transcript trước khi chạy.`);
+    notice(`Imported ${dataset.samples.length} valid pairs. Listen and review transcripts before running.`);
   } catch (e) { notice(e.message, true); }
-  finally { $('upload').disabled = false; $('upload').textContent = 'Kiểm tra & nhập dataset'; }
+  finally { $('upload').disabled = false; $('upload').textContent = 'Validate & import dataset'; }
 };
 $('model-form').onsubmit = async event => {
   event.preventDefault();
@@ -167,20 +196,25 @@ $('model-form').onsubmit = async event => {
       languages:($('model-languages').value || 'en,vi').split(','),
       python_executable:$('backend-python').value || '',
       vad_filter:$('vad').checked, allow_download:$('download').checked});
-    selectedModels.add(config.label); await refresh(); notice(`Đã lưu cấu hình ${config.label}.`);
+    selectedModels.add(config.label); await refresh(); notice(`Saved configuration ${config.label}.`);
   } catch (e) { notice(e.message, true); }
 };
 $('run').onclick = async () => {
-  if (!$('dataset').value) return notice('Nhập hoặc chọn một dataset trước.', true);
-  if (!$('reviewed').checked) return notice('Xác nhận bạn đã nghe và kiểm tra transcript chuẩn.', true);
+  if (!$('dataset').value) return notice('Import or select a dataset first.', true);
+  if (!$('reviewed').checked) return notice('Confirm that you have listened to and reviewed the reference transcripts.', true);
+  const scope = $('model-scope').value;
+  if (['experiment2', 'experiment3'].includes($('benchmark-mode').value))
+    return notice('This automatic model selection has been retired. Choose models explicitly.', true);
+  if (scope === 'vi-live' && ![1,2].includes(Number($('chunk-seconds').value)))
+    return notice('For the Vietnamese-English live baseline, choose 1 or 2 seconds and run each separately.', true);
   const {models} = batchModels();
-  if (!models.length) return notice('Chọn ít nhất một cấu hình model.', true);
+  if (!models.length) return notice('Select at least one model configuration.', true);
   const missing = models.filter(m => !m.python_executable && state.backends?.[m.backend]?.installed === false);
-  if (missing.length) return notice(`Chưa cài backend: ${[...new Set(missing.map(m=>m.backend))].join(', ')}. Xem hướng dẫn trong phần cấu hình.`, true);
+  if (missing.length) return notice(`Backends not installed: ${[...new Set(missing.map(m=>m.backend))].join(', ')}. See the setup instructions in the configuration section.`, true);
   $('run').disabled = true; notice('');
   try {
     const run = await post('/api/runs', {dataset_id:$('dataset').value, models, references_reviewed:true,
-      options:{mode:$('benchmark-mode').value || 'final', chunk_seconds:Number($('chunk-seconds').value || 3), allow_cloud:$('cloud-consent').checked === true}});
+      options:{mode:scope==='vi-video'?'final':scope==='vi-live'?'live_replay':$('benchmark-mode').value || 'final', sample_limit:Number($('sample-limit').value || 0), chunk_seconds:Number($('chunk-seconds').value || 3), allow_cloud:$('cloud-consent').checked === true}});
     await refresh(); $('history').value = run.id; await showRun(run.id);
   } catch (e) { notice(e.message, true); $('run').disabled = false; }
 };
@@ -203,14 +237,23 @@ function renderRun() {
   $('empty').hidden = true; $('report').hidden = false; $('detail-card').hidden = false;
   updateRunButton();
   $('cancel').hidden = !active; $('cancel').disabled = run.status === 'cancelling';
-  $('run-message').textContent = run.message;
+  $('resume').hidden = run.status !== 'interrupted';
+  $('run-message').textContent = ['completed', 'completed_with_errors', 'cancelled', 'interrupted'].includes(run.status) ? statusText(run.status) : run.message;
   $('progress').max = run.total_tasks; $('progress').value = run.completed_tasks;
-  $('run-meta').textContent = `${statusText(run.status)} · ${run.dataset.name} · ${run.completed_tasks}/${run.total_tasks} tác vụ · ${run.dataset.language.toUpperCase()} · ${run.options?.mode === 'live_replay' ? `Chia đoạn ${run.options.chunk_seconds}s` : 'Cả file'}`;
+  $('run-meta').textContent = `${statusText(run.status)} · ${run.dataset.name} · ${run.completed_tasks}/${run.total_tasks} tasks · ${run.dataset.language.toUpperCase()} · ${run.options?.mode === 'live_replay' ? `Chunks: ${run.options.chunk_seconds}s` : 'Whole file'}`;
   $('summary').replaceChildren();
+  $('run-meta').textContent += ` | Protocol: ${run.options?.protocol || 'full-file-v1'}`;
+  if (run.options?.mode === 'experiment2') $('run-meta').textContent = `${statusText(run.status)} | ${run.dataset.name} | ${run.completed_tasks}/${run.total_tasks} | Qwen real-time replay | ${run.options.protocol}`;
   run.models.forEach(model => {
     const row = node('tr'), first = node('td', model.config.label);
-    first.append(node('small', `${statusText(model.status)}${model.load_s == null ? '' : ` · nạp ${seconds(model.load_s)}`}`));
+    first.append(node('small', `${statusText(model.status)}${model.load_s == null ? '' : ` · load ${seconds(model.load_s)}`}`));
     if (model.error) first.append(node('small', model.error, 'error-text'));
+    if (run.options?.mode?.startsWith('experiment')) {
+      for (const [key,label] of [['wall_s','File completion'],['first_text_from_vad_s','First text from VAD onset'],['finalization_from_eof_s','Finalization after EOF'],['max_queue_s','Per-file peak queue']]) {
+        const s=model.summary;
+        if (s[`${key}_p95`] != null) first.append(node('small', `${label}: median ${seconds(s[`${key}_median`])}, p95 ${seconds(s[`${key}_p95`])}, max ${seconds(s[`${key}_max`])}`));
+      }
+    }
     row.append(first, node('td', `${model.summary.completed}/${run.dataset.samples.length}`), node('td', model.summary.failed),
       node('td', pct(model.summary.wer)), node('td', pct(model.common_summary.wer)),
       node('td', pct(model.summary.cer)), node('td', pct(model.common_summary.cer)),
@@ -219,7 +262,7 @@ function renderRun() {
       ...['chunk_p95_s','lag_p95_s','first_text_p95_s'].map(key => node('td', model.summary[key] == null ? '—' : seconds(model.summary[key]))));
     $('summary').append(row);
   });
-  $('comparison-note').textContent = `WER chung hiện có ${run.common_sample_count} mẫu mọi model đều thành công. ${active ? 'Kết quả đang cập nhật; chờ hoàn tất để so sánh.' : 'WER từng model chỉ tính mẫu thành công; luôn xem kèm số lỗi và độ phủ.'}`;
+  $('comparison-note').textContent = `Common WER currently covers ${run.common_sample_count} samples that succeeded across all models. ${active ? 'Results are updating; wait for completion before comparing.' : 'Per-model WER includes successful samples only; always check failures and coverage.'}`;
   $('csv').href = `/api/runs/${run.id}/csv`; $('json').href = `/api/runs/${run.id}/json`;
   $('summary-csv').href = `/api/runs/${run.id}/summary.csv`;
   const choice = $('detail-model').value;
@@ -232,20 +275,20 @@ function renderSamples() {
   const model = currentRun?.models[Number($('detail-model').value)]; if (!model) return;
   const open = new Set([...$('sample-results').querySelectorAll('details[open]')].map(e => e.dataset.id));
   $('sample-results').replaceChildren();
-  if (!model.samples.length) $('sample-results').append(node('p', 'Kết quả từng mẫu sẽ xuất hiện tại đây.', 'hint'));
+  if (!model.samples.length) $('sample-results').append(node('p', 'Sample results will appear here.', 'hint'));
   model.samples.forEach(row => {
     const detail = node('details', null, 'sample-row'); detail.dataset.id = row.id; detail.open = open.has(row.id);
-    const title = node('summary'); title.append(node('span', row.id), node('span', row.status === 'ok' ? `WER ${pct(row.wer)} · ${seconds(row.elapsed_s)}` : 'Lỗi'));
+    const title = node('summary'); title.append(node('span', row.id), node('span', row.status === 'ok' ? `WER ${pct(row.wer)} · ${seconds(row.elapsed_s)}` : 'Error'));
     detail.append(title);
     if (row.status !== 'ok') detail.append(node('p', row.error, 'error-text'));
     else {
       const pair = node('div', null, 'text-pair');
-      for (const [label, text] of [['Transcript chuẩn',row.reference],['Model nhận dạng',row.hypothesis || '(Không nhận ra lời nói)']]) {
+      for (const [label, text] of [['Reference transcript',row.reference],['Model prediction',row.hypothesis || '(No speech recognized)']]) {
         const side = node('div'); side.append(node('h4', label), node('p', text)); pair.append(side);
       }
-      detail.append(pair, node('p', `Sai ${row.substitutions} · Thiếu ${row.deletions} · Thêm ${row.insertions} · ${row.reference_words} từ chuẩn`, 'hint'));
-      detail.append(node('p', `CER ${pct(row.cer)}${row.replay_metrics ? ` · ${row.replay_metrics.chunk_count} đoạn · ${row.replay_metrics.deadline_misses} đoạn xử lý lâu hơn thời lượng đoạn` : ''}`, 'hint'));
-      if (row.chunks) row.chunks.forEach(c => detail.append(node('p', `${c.start_s.toFixed(1)}–${c.end_s.toFixed(1)}s · xử lý ${c.elapsed_s.toFixed(2)}s · trễ ${c.lag_s.toFixed(2)}s: ${c.text}`, 'hint')));
+      detail.append(pair, node('p', `Substitutions ${row.substitutions} · Deletions ${row.deletions} · Insertions ${row.insertions} · ${row.reference_words} reference words`, 'hint'));
+      detail.append(node('p', `CER ${pct(row.cer)}${row.replay_metrics ? ` · ${row.replay_metrics.chunk_count} chunks · ${row.replay_metrics.deadline_misses} chunks took longer to process than their audio duration` : ''}`, 'hint'));
+      if (row.chunks) row.chunks.forEach(c => detail.append(node('p', `${c.start_s.toFixed(1)}–${c.end_s.toFixed(1)}s · processing ${c.elapsed_s.toFixed(2)}s · lag ${c.lag_s.toFixed(2)}s: ${c.text}`, 'hint')));
     }
     $('sample-results').append(detail);
   });
@@ -253,9 +296,22 @@ function renderSamples() {
 $('detail-model').onchange = renderSamples;
 $('history').onchange = () => showRun($('history').value).catch(e => notice(e.message,true));
 $('cancel').onclick = async () => { try { await post('/api/cancel', {run_id:currentRun.id}); await showRun(currentRun.id); } catch(e) { notice(e.message,true); } };
+$('resume').onclick = async () => {
+  const id = currentRun?.id;
+  if (!id || currentRun.status !== 'interrupted' || resumePending) return;
+  resumePending = true;
+  updateRunButton();
+  notice('Checking dataset and backing up saved results before resuming...');
+  try {
+    await post('/api/resume', {run_id:id});
+    await refresh(); $('history').value = id; await showRun(id);
+    notice('Resumed. Saved results are preserved; only missing samples will run.');
+  } catch(e) { notice(e.message,true); }
+  finally { resumePending = false; updateRunButton(); if (currentRun) renderRun(); }
+};
 (async () => {
   try { await refresh(); if (state.models.length) { selectedModels.add(state.models[0].label); renderModels(); }
     const last = state.runs.find(r => activeStatus(r.status)) || state.runs[0];
     if (last) { $('history').value=last.id; await showRun(last.id); }
-  } catch(e) { notice(`Không kết nối được tool: ${e.message}`,true); }
+  } catch(e) { notice(`Cannot connect to the tool: ${e.message}`,true); }
 })();

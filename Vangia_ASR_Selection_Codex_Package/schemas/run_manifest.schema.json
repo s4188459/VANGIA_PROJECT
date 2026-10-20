@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vangia.local/schemas/asrlab-run-manifest-v1.json",
+  "title": "ASR lab immutable run manifest",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "run_id",
+    "schema_version",
+    "language",
+    "dataset_id",
+    "dataset_split",
+    "input_mode",
+    "created_utc",
+    "evidence_class",
+    "status"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "created_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "language": {
+      "const": "en"
+    },
+    "dataset_id": {
+      "type": "string"
+    },
+    "dataset_split": {
+      "enum": [
+        "legacy_development",
+        "development",
+        "holdout",
+        "public_benchmark",
+        "synthetic_fixture"
+      ]
+    },
+    "input_mode": {
+      "enum": [
+        "historical_whole_file",
+        "batch_file",
+        "paced_replay",
+        "live_microphone",
+        "live_loopback",
+        "native_streaming",
+        "synthetic_fixture"
+      ]
+    },
+    "evidence_class": {
+      "enum": [
+        "E-LOCAL",
+        "I",
+        "P",
+        "G",
+        "SYNTHETIC"
+      ]
+    },
+    "status": {
+      "enum": [
+        "planned",
+        "running",
+        "completed",
+        "failed",
+        "blocked",
+        "cancelled"
+      ]
+    },
+    "model_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "checkpoint_revision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "weights_sha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "model_config_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "backend": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "backend_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hardware": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "audio_sha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reference_revision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "normalization_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "random_seed": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "consent_record_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "clock_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "clock_calibration": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "config": {
+      "type": "object"
+    },
+    "missing_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_urls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    }
+  }
+}

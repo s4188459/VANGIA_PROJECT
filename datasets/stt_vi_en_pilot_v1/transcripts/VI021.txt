@@ -1,0 +1,7 @@
+Thầy ơi, sau khi có transcript thì con xuất subtitle luôn được chưa ạ?
+
+Con nên kiểm tra thêm timestamp của từng đoạn. Nội dung đúng mà xuất hiện lệch thời điểm thì phụ đề vẫn khó theo dõi.
+
+Vậy con sẽ đánh giá chất lượng transcript và độ chính xác timestamp riêng nhé thầy?
+
+Đúng rồi. Sau đó con mở video cùng subtitle để kiểm tra trải nghiệm đọc trong tình huống thực tế.

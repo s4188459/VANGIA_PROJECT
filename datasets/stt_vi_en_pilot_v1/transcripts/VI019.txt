@@ -1,0 +1,7 @@
+Thầy ơi, ứng dụng gửi request đến API rồi nhận response ở dạng JSON, đúng không ạ?
+
+Đúng trong cách thiết kế con đang dùng. Con cũng cần xử lý trường hợp máy chủ trả lỗi hoặc phản hồi quá chậm.
+
+Con định lưu thời gian gửi request và nhận response để tìm nguyên nhân. Như vậy được không thầy?
+
+Được. Con sẽ dễ phân biệt thời gian chờ kết nối với thời gian model xử lý hơn.

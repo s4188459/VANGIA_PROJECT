@@ -1,0 +1,13 @@
+{
+  "sample_id": "NEW001",
+  "audio": "C:/ASR/consented_audio/NEW001.wav",
+  "text": "Replace with the approved English reference.",
+  "language": "en",
+  "speaker_id": "speaker-001",
+  "session_id": "session-001",
+  "domain": "classroom",
+  "consent_record_id": "replace-with-actual-consent-record",
+  "provenance_type": "real_measurement",
+  "reference_quality": "unverified",
+  "split": "development"
+}

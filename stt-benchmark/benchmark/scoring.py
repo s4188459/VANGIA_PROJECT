@@ -20,9 +20,9 @@ def score(reference, hypothesis):
     """
     ref, hyp = normalize(reference).split(), normalize(hypothesis).split()
     if not ref:
-        raise ValueError("Transcript chuẩn không có từ để chấm.")
+        raise ValueError("Reference transcript contains no words to score.")
     if len(ref) > 3000 or len(hyp) > 6000:
-        raise ValueError("Mẫu quá dài để chấm: tối đa 3.000 từ chuẩn / 6.000 từ dự đoán.")
+        raise ValueError("Sample exceeds scoring limits: 3,000 reference words / 6,000 predicted words.")
     # Each entry is (total edits, substitutions, deletions, insertions).
     previous = [(j, 0, 0, j) for j in range(len(hyp) + 1)]
     for i, word in enumerate(ref, 1):

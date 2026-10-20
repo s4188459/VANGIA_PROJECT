@@ -1,0 +1,7 @@
+Thưa thầy, máy con chỉ chạy bằng CPU, chưa có GPU phù hợp. Con vẫn thử được model lớn chứ ạ?
+
+Con có thể thử nếu máy đủ tài nguyên, nhưng cần theo dõi RAM và thời gian tải model.
+
+Nếu model tải được thì con có thể dùng ngay cho phiên âm trực tiếp không thầy?
+
+Chưa thể kết luận. Con còn phải đo tốc độ xử lý và độ trễ trên đúng máy sẽ dùng.

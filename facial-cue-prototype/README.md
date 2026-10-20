@@ -1,5 +1,10 @@
 # Multimodal Facial Dataset Collector
 
+> Model selection is pending. The previous Qwen3-ASR-0.6B / Whisper large-v3
+> decision was withdrawn on 2026-10-20. Runtime defaults below are legacy
+> prototype baselines, not a new model recommendation. Use `../vangia-asr-lab/`
+> for continued evaluation.
+
 Local Windows prototype for collecting synchronized data for future AI research.
 It tracks one face inside a selected Meet/Zoom region and always stores facial
 features and observable events. With explicit participant consent, it can also

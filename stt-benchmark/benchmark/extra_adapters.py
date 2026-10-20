@@ -11,14 +11,21 @@ def local_snapshot(config):
     if path.is_dir():
         return str(path.resolve())
     from huggingface_hub import snapshot_download
-    return snapshot_download(config['model'], local_files_only=not config['allow_download'])
+    if not config['allow_download']:
+        for cache in (str(Path(__file__).resolve().parents[1] / 'data' / 'hf-cache'), None):
+            try:
+                return snapshot_download(config['model'], local_files_only=True, cache_dir=cache)
+            except Exception:
+                pass
+    return snapshot_download(config['model'], local_files_only=not config['allow_download'],
+                             cache_dir=str(Path(__file__).resolve().parents[1] / 'data' / 'hf-cache'))
 
 
 def samples(path):
     import numpy as np
     with wave.open(str(path), 'rb') as audio:
         if (audio.getnchannels(), audio.getsampwidth(), audio.getframerate()) != (1, 2, 16000):
-            raise ValueError('Backend cần WAV PCM16 mono 16 kHz; hãy import lại dataset.')
+            raise ValueError('This backend requires mono 16 kHz PCM16 WAV; reimport the dataset.')
         return np.frombuffer(audio.readframes(audio.getnframes()), dtype='<i2').astype('float32') / 32768
 
 
@@ -30,7 +37,7 @@ class TorchAdapter:
         import torch
         torch.set_num_threads(self.config['cpu_threads'])
         if self.config['device'] == 'cuda' and not torch.cuda.is_available():
-            raise ValueError('CUDA không khả dụng trong môi trường backend này.')
+            raise ValueError('CUDA is unavailable in this backend environment.')
         return torch, getattr(torch, self.config['compute_type'])
 
     def close(self):
@@ -100,7 +107,7 @@ class NemoAdapter(TorchAdapter):
             folder = Path(local_snapshot(self.config))
             weights = list(folder.glob('*.nemo'))
             if len(weights) != 1:
-                raise ValueError('Cần thư mục chứa đúng một .nemo hoặc đường dẫn file .nemo.')
+                raise ValueError('Provide a directory containing exactly one .nemo file or a .nemo file path.')
             target = weights[0]
         self.model = asr.models.ASRModel.restore_from(str(target), map_location=self.config['device'])
         self.model = self.model.to(device=self.config['device'], dtype=dtype).eval()
@@ -133,6 +140,32 @@ class SenseVoiceAdapter(TorchAdapter):
         return {'text': ' '.join(re.sub(r'<\|[^|]*\|>', '', r['text']).strip() for r in rows)}
 
 
+class FunASRMLTAdapter(TorchAdapter):
+    def load(self):
+        from funasr import AutoModel
+        import funasr.models.fun_asr_nano.model  # Register the installed implementation.
+        self.setup()
+        target = Path(local_snapshot(self.config))
+        # The bundled LLM/tokenizer must resolve locally, even when downloads are off.
+        llm = target / 'Qwen3-0.6B'
+        if not (llm / 'config.json').is_file():
+            raise ValueError('Incomplete Fun-ASR-MLT snapshot: Qwen3-0.6B/config.json is missing.')
+        self.model = AutoModel(model=str(target), device=self.config['device'],
+            disable_update=True, trust_remote_code=False,
+            llm_conf={'init_param_path': str(llm), 'llm_dtype': 'fp32'},
+            tokenizer_conf={'init_param_path': str(llm)})
+
+    def transcribe(self, audio_path, language):
+        audio = samples(audio_path)
+        texts = []
+        for start in range(0, len(audio), 30 * 16000):
+            rows = self.model.generate(input=audio[start:start + 30 * 16000], cache={},
+                language={'en': '英文', 'vi': '越南语'}[language], itn=False,
+                batch_size=1, llm_kwargs={'do_sample': False})
+            texts.extend(row['text'] for row in rows)
+        return {'text': ' '.join(texts), 'detected_language': None}
+
+
 class VoskAdapter:
     def __init__(self, config):
         self.config, self.model = config, None
@@ -140,8 +173,35 @@ class VoskAdapter:
     def load(self):
         from vosk import Model
         target = Path(self.config['model']).expanduser()
+        cached = Path(__file__).resolve().parents[1] / 'data' / 'model-cache' / target.name
+        official = {'vosk-model-small-en-us-0.15', 'vosk-model-en-us-0.22',
+                    'vosk-model-small-vn-0.4', 'vosk-model-vn-0.4'}
+        if not target.is_dir() and not cached.is_dir() and self.config['allow_download'] and self.config['model'] in official:
+            import tempfile
+            import urllib.request
+            import zipfile
+            cache_root = cached.parent.resolve()
+            cache_root.mkdir(parents=True, exist_ok=True)
+            # Extract into a unique staging folder, then publish the complete directory.
+            with tempfile.TemporaryDirectory(dir=cache_root, prefix='download-') as temp:
+                temp = Path(temp)
+                archive = temp / 'model.zip'
+                with urllib.request.urlopen('https://alphacephei.com/vosk/models/' + target.name + '.zip', timeout=120) as response, archive.open('wb') as out:
+                    while True:
+                        block = response.read(1024 * 1024)
+                        if not block:
+                            break
+                        out.write(block)
+                with zipfile.ZipFile(archive) as bundle:
+                    for entry in bundle.infolist():
+                        if not (temp / entry.filename).resolve().is_relative_to(temp.resolve()):
+                            raise ValueError('Unsafe path in Vosk archive.')
+                    bundle.extractall(temp)
+                (temp / target.name).rename(cached)
+        if not target.is_dir() and cached.is_dir():
+            target = cached
         if not target.is_dir():
-            raise ValueError('Vosk cần đường dẫn model đã giải nén từ https://alphacephei.com/vosk/models .')
+            raise ValueError('Vosk requires an extracted model directory from https://alphacephei.com/vosk/models .')
         self.model = Model(str(target.resolve()))
 
     def transcribe(self, audio_path, language):
@@ -149,7 +209,7 @@ class VoskAdapter:
         texts = []
         with wave.open(str(audio_path), 'rb') as audio:
             if (audio.getnchannels(), audio.getsampwidth()) != (1, 2):
-                raise ValueError('Vosk cần WAV PCM16 mono.')
+                raise ValueError('Vosk requires mono PCM16 WAV.')
             rec = KaldiRecognizer(self.model, audio.getframerate())
             while True:
                 data = audio.readframes(4000)
@@ -172,7 +232,7 @@ class ElevenLabsAdapter:
     def load(self):
         import requests
         if not os.environ.get('ELEVENLABS_API_KEY'):
-            raise ValueError('Thiếu biến môi trường ELEVENLABS_API_KEY của server.')
+            raise ValueError('ELEVENLABS_API_KEY is missing from the server environment.')
 
     def transcribe(self, audio_path, language):
         import requests
@@ -183,7 +243,7 @@ class ElevenLabsAdapter:
                 data={'model_id': self.config['model'], 'language_code': {'en': 'eng', 'vi': 'vie'}[language],
                       'tag_audio_events': 'false', 'diarize': 'false'}, timeout=(15, 600))
         if not response.ok:
-            raise ValueError(f'ElevenLabs HTTP {response.status_code}; kiểm tra key, quota và model.')
+            raise ValueError(f'ElevenLabs HTTP {response.status_code}; check the API key, quota and model.')
         result = response.json()
         return {'text': result['text'], 'detected_language': result.get('language_code')}
 
@@ -201,14 +261,14 @@ class GoogleChirpAdapter:
         self.project = os.environ.get('GOOGLE_CLOUD_PROJECT')
         self.location = os.environ.get('GOOGLE_CLOUD_LOCATION')
         if not self.project or not self.location:
-            raise ValueError('Cần GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION và Google ADC.')
+            raise ValueError('GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION and Google ADC are required.')
         self.client = speech_v2.SpeechClient(client_options=ClientOptions(api_endpoint=f'{self.location}-speech.googleapis.com'))
 
     def transcribe(self, audio_path, language):
         from google.cloud.speech_v2.types import cloud_speech
         with wave.open(str(audio_path), 'rb') as audio:
             if audio.getnframes() / audio.getframerate() > 60:
-                raise ValueError('Chirp synchronous giới hạn 60 giây/mẫu; dùng dataset đoạn ngắn.')
+                raise ValueError('Synchronous Chirp requests are limited to 60 seconds/sample; use shorter recordings.')
         config = cloud_speech.RecognitionConfig(auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
                     language_codes=[{'en': 'en-US', 'vi': 'vi-VN'}[language]], model=self.config['model'])
         result = self.client.recognize(request=cloud_speech.RecognizeRequest(

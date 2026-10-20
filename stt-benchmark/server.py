@@ -14,7 +14,7 @@ from urllib.parse import parse_qs, urlsplit
 from benchmark.adapters import validate_config
 from benchmark.datasets import MAX_UPLOAD, import_zip, write_json
 from benchmark.runner import Runner, export_csv, export_summary_csv
-from benchmark.catalog import catalog, backend_status
+from benchmark.catalog import catalog_with_cache_status, backend_status
 
 ROOT = Path(__file__).resolve().parent
 HEX = re.compile(r"[0-9a-f]{32}\Z")
@@ -71,20 +71,20 @@ def make_server(data_root, port=8766):
             port = self.server.server_port
             allowed = {f"127.0.0.1:{port}", f"localhost:{port}"}
             if self.headers.get("Host") not in allowed:
-                raise ValueError("Chỉ hỗ trợ truy cập localhost.")
+                raise ValueError("Only localhost access is supported.")
             origin = self.headers.get("Origin")
             if origin and origin not in {"http://" + host for host in allowed}:
-                raise ValueError("Nguồn yêu cầu không hợp lệ.")
+                raise ValueError("Invalid request origin.")
 
         def json_body(self):
             if self.headers.get_content_type() != "application/json":
-                raise ValueError("Cần Content-Type application/json.")
+                raise ValueError("Content-Type must be application/json.")
             size = int(self.headers.get("Content-Length", "0"))
             if not 0 < size <= 512 * 1024:
-                raise ValueError("JSON quá lớn hoặc rỗng.")
+                raise ValueError("JSON is empty or too large.")
             value = json.loads(self.rfile.read(size))
             if not isinstance(value, dict):
-                raise ValueError("JSON phải là object.")
+                raise ValueError("JSON must be an object.")
             return value
 
         def do_GET(self):
@@ -107,7 +107,7 @@ def make_server(data_root, port=8766):
                     with config_lock:
                         models = json.loads(models_path.read_text(encoding="utf-8"))
                     return self.reply(200, {"datasets": sorted(datasets, key=lambda d: d["created_at"], reverse=True),
-                                           "models": models, "catalog": catalog(), "backends": backend_status(),
+                                           "models": models, "catalog": catalog_with_cache_status(), "backends": backend_status(),
                                            "runs": sorted(runs, key=lambda r: r["created_at"], reverse=True)})
                 parts = route.strip("/").split("/")
                 if len(parts) in (3, 4) and parts[:2] == ["api", "runs"] and HEX.fullmatch(parts[2]):
@@ -123,15 +123,15 @@ def make_server(data_root, port=8766):
                 if len(parts) == 5 and parts[:2] == ["api", "datasets"] and HEX.fullmatch(parts[2]):
                     manifest = json.loads((data_root / "datasets" / parts[2] / "manifest.json").read_text(encoding="utf-8"))
                     if parts[3] not in {s["id"] for s in manifest["samples"]}:
-                        raise ValueError("Không có mẫu này trong dataset.")
+                        raise ValueError("Sample not found in this dataset.")
                     folder = data_root / "datasets" / parts[2]
                     if parts[4] == "audio":
                         return self.reply(200, (folder / "audio" / f"{parts[3]}.wav").read_bytes(), "audio/wav")
                     if parts[4] == "reference":
                         return self.reply(200, {"text": (folder / "transcripts" / f"{parts[3]}.txt").read_text(encoding="utf-8")})
-                self.reply(404, {"error": "Không tìm thấy."})
+                self.reply(404, {"error": "Not found."})
             except FileNotFoundError:
-                self.reply(404, {"error": "Không tìm thấy dữ liệu."})
+                self.reply(404, {"error": "Data not found."})
             except (ValueError, KeyError) as exc:
                 self.reply(400, {"error": str(exc)})
             except Exception as exc:
@@ -146,14 +146,14 @@ def make_server(data_root, port=8766):
                         raise ValueError("Upload file ZIP.")
                     size = int(self.headers.get("Content-Length", "0"))
                     if not 0 < size <= MAX_UPLOAD:
-                        raise ValueError("ZIP phải nhỏ hơn hoặc bằng 512 MB.")
+                        raise ValueError("ZIP must not exceed 512 MB.")
                     query = parse_qs(route.query)
                     with tempfile.TemporaryFile() as archive:
                         remaining = size
                         while remaining:
                             chunk = self.rfile.read(min(1024 * 1024, remaining))
                             if not chunk:
-                                raise ValueError("Upload bị ngắt trước khi hoàn tất.")
+                                raise ValueError("Upload interrupted before completion.")
                             archive.write(chunk)
                             remaining -= len(chunk)
                         archive.seek(0)
@@ -167,20 +167,22 @@ def make_server(data_root, port=8766):
                         models = json.loads(models_path.read_text(encoding="utf-8"))
                         models = [m for m in models if m["label"] != config["label"]]
                         if len(models) >= 50:
-                            raise ValueError("Tối đa 50 cấu hình đã lưu.")
+                            raise ValueError("Maximum of 50 saved configurations.")
                         models.append(config)
                         write_json(models_path, models)
                     return self.reply(201, config)
                 if route.path == "/api/runs":
                     if value.get("references_reviewed") is not True:
-                        raise ValueError("Cần xác nhận transcript đã được nghe kiểm tra.")
+                        raise ValueError("Confirm that you have listened to and reviewed the reference transcripts.")
                     return self.reply(201, runner.start(value.get("dataset_id"), value.get("models"), value.get('options')))
                 if route.path == "/api/cancel":
                     runner.cancel(value.get("run_id"))
                     return self.reply(200, {"ok": True})
-                self.reply(404, {"error": "Không tìm thấy."})
+                if route.path == "/api/resume":
+                    return self.reply(200, runner.resume(value.get('run_id')))
+                self.reply(404, {"error": "Not found."})
             except FileNotFoundError:
-                self.reply(404, {"error": "Không tìm thấy dữ liệu."})
+                self.reply(404, {"error": "Data not found."})
             except Exception as exc:
                 self.reply(400, {"error": str(exc)})
 

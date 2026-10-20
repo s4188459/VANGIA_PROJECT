@@ -16,11 +16,13 @@ import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from server import ROOT, default_models, make_server
+from benchmark.catalog import supported_languages
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--audio', type=Path, required=True)
+    parser.add_argument('--all-ready', action='store_true', help='Test all saved English configs, offline only.')
     args = parser.parse_args()
     data_root = ROOT/'data'/'smoke'/('http-'+uuid.uuid4().hex)
     audio = args.audio.read_bytes()
@@ -54,23 +56,32 @@ def main():
         preview = json.loads(request(f"/api/datasets/{dataset['id']}/SMOKE001/reference"))['text']
         assert preview == reference.replace('\r\n','\n').strip()
         models = default_models()
-        assert len(models)==2,'Expected installed base.en and small.en'
+        if args.all_ready:
+            models = [m for m in json.loads((ROOT/'data/models.json').read_text(encoding='utf-8'))
+                      if 'en' in supported_languages(m) and m['backend'] not in ('elevenlabs','google-chirp')]
+            models = [{**m, 'allow_download':False} for m in models]
+        assert models,'Expected installed models'
         payload = {'dataset_id':dataset['id'],'models':models,'references_reviewed':True}
         run = json.loads(request('/api/runs',json.dumps(payload).encode()))
         print('HTTP real-model run: '+run['id'],flush=True)
-        deadline = time.monotonic()+180
+        deadline = time.monotonic()+600
         while run['status'] in ('running','cancelling'):
             if time.monotonic()>deadline:
-                raise TimeoutError('HTTP smoke exceeded 180 seconds')
+                raise TimeoutError('HTTP smoke exceeded 600 seconds')
             time.sleep(.2)
             run = json.loads(request('/api/runs/'+run['id']))
         assert run['status']=='completed',run
-        assert run['completed_tasks']==2 and run['common_sample_count']==1
+        assert run['completed_tasks']==len(models) and run['common_sample_count']==1
         assert all(m['samples'][0]['hypothesis'].strip() for m in run['models'])
         csv_data = request('/api/runs/'+run['id']+'/csv')
         csv_rows = list(csv.DictReader(io.StringIO(csv_data.decode('utf-8-sig'))))
         report = json.loads(request('/api/runs/'+run['id']+'/json'))
-        assert report==run and len(csv_rows)==2
+        assert report==run and len(csv_rows)==len(models)
+        summary_rows = list(csv.DictReader(io.StringIO(request('/api/runs/'+run['id']+'/summary.csv').decode('utf-8-sig'))))
+        assert len(summary_rows)==len(models)
+        for row,model in zip(summary_rows,run['models']):
+            assert float(row['wer'])==model['summary']['wer']
+            assert float(row['cer'])==model['summary']['cer']
         for row,model in zip(csv_rows,run['models']):
             sample=model['samples'][0]
             assert row['sample_id']=='SMOKE001' and row['hypothesis']==sample['hypothesis']

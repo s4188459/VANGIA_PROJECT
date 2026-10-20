@@ -1,0 +1,7 @@
+Thưa thầy, tại sao con phải chia dữ liệu thành training set, validation set và test set ạ?
+
+Training set dùng để học, còn validation set giúp con chọn cấu hình. Test set được giữ lại để đánh giá sau cùng.
+
+Nếu con xem test set rồi sửa model nhiều lần thì có vấn đề gì không thầy?
+
+Có. Khi đó con đang dùng kết quả kiểm tra để điều chỉnh model, nên điểm cuối có thể lạc quan hơn thực tế.

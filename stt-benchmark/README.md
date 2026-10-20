@@ -1,70 +1,26 @@
-# STT Bench
+﻿# STT Bench
 
-Tool độc lập để nhập dataset, chọn cấu hình model và so sánh chỉ số. Không import code của app dạy–học. Tool không tự chọn model hay gán mục đích sử dụng.
+A tool for importing audio datasets, configuring speech recognition models, and comparing benchmark metrics. General benchmark modes support manual model selection. The previous Qwen/Whisper selection was withdrawn on 2026-10-20. Its automatic experiment shortcuts have been removed from the web UI. Legacy experiment code remains for reproducing historical runs, not as an approved model choice. Continue model selection in `../vangia-asr-lab/`.
 
-## Chạy tất cả trong một báo cáo
+See [English experiments 2 and 3](EXPERIMENTS.md) for timing definitions, pilot/full runs, CSV exports and limitations. Select **Select models manually** under scope, choose an experiment under **Audio input protocol**, then select **Pilot: first 3 samples** or **All samples**. You do not need to check a model for these two experiment modes.
 
-Chọn dataset → **Phạm vi benchmark** → **Tất cả model phù hợp trong danh mục + cấu hình đã lưu**. Tool lọc ngôn ngữ, ưu tiên cấu hình đã lưu thay vì preset trùng checkpoint. Preset mới dùng CPU INT8 (faster-whisper) hoặc CPU float32; muốn cấu hình GPU hãy lưu cấu hình trước. Mục **Tất cả cấu hình đã lưu phù hợp** chỉ chạy các model bạn đã thêm.
+## Start the tool
 
-Backend chưa cài và cloud chưa cho phép được liệt kê là bỏ qua trước khi chạy, không đưa vào số model đã test. Weights chưa có sẽ báo lỗi trong báo cáo trừ khi cho phép tải. Không tự cài dependencies, không tự bật cloud. Chạy tối đa 50 cấu hình tuần tự; một model lỗi không dừng các model sau. Bấm **CSV tổng hợp** để lấy mỗi model một dòng, hoặc **CSV từng mẫu** để xem chi tiết. Nếu một model thất bại mọi mẫu, giao các mẫu chung có thể rỗng; không coi điểm trống là 0 lỗi.
-
-## Nhiều backend và chỉ số (2026-10-09)
-
-Danh mục EN/VI có Whisper, Distil-Whisper, PhoWhisper, Qwen3-ASR, Parakeet, Canary, SenseVoice, wav2vec2, MMS, Vosk và API ElevenLabs/Google Chirp. Danh mục là cấu hình ứng viên, không phải thông báo tất cả weights đã cài hoặc đã được kiểm chứng trên máy này.
-
-1. Chọn ngôn ngữ ở **Lọc danh mục model**.
-2. Chọn checkpoint → **Điền cấu hình model này**.
-3. Kiểm tra backend, Python, thiết bị, ngôn ngữ và model path. Bật tải model nếu dùng tên remote. Vosk cần tải/giải nén model trước.
-4. **Lưu cấu hình**, chọn các checkbox model rồi chạy cùng dataset (tối đa 8 cấu hình/lượt).
-5. Đọc WER, CER, số lỗi/thành công, thời gian và RTF; tải JSON/CSV để lưu kết quả.
-
-### Cài backend độc lập
-
-Không cài toàn bộ ML stack vào môi trường của app. Từ workspace:
-
-```powershell
-.\stt-benchmark\install-backend.ps1 -Backend transformers-whisper
-.\stt-benchmark\install-backend.ps1 -Backend vosk
-```
-
-Backend hợp lệ: `faster-whisper`, `transformers-whisper`, `transformers-ctc`, `qwen-asr`, `nemo`, `sensevoice`, `vosk`, `elevenlabs`, `google-chirp`. Script tạo `.backends/<backend>`; refresh giao diện rồi chọn lại preset sẽ điền Python tương ứng. Cũng có thể nhập đường dẫn Python riêng đã cài backend. NeMo ưu tiên Linux/GPU theo model card; script Windows không bảo đảm NeMo cài thành công. Worker hiện chỉ gọi Python local trên cùng OS, chưa điều khiển WSL/remote tự động.
-
-Thư viện được import lazily. Việc phát hiện module/venv không chứng minh model đã tải hoặc CUDA sẵn sàng. Thiếu dependency/weights được ghi thành lỗi, không chấm thành transcript rỗng thành công. Các adapter ngoài những model có smoke test thật trong QA_REPORT còn cần xác minh trên phần cứng và checkpoint bạn chọn.
-
-### Giao thức đo
-
-- **Cả file:** đưa audio đầy đủ vào adapter. Transformers và SenseVoice chia block tối đa 30 giây, không overlap; giữ các block để tránh cắt mất phần cuối file. Biên block có thể ảnh hưởng WER. CTC dùng greedy, không LM ngoài. Các backend khác dùng decoder mặc định trừ Whisper có beam cấu hình được.
-- **Chia đoạn tuần tự:** cắt cố định 1–15 giây, không overlap/context giữa đoạn. Một worker giả định mỗi đoạn sẵn sàng tại thời điểm cuối đoạn; `emitted_at = max(chunk_end, previous_emitted_at) + processing_time`. Không sleep theo thời gian thực. Báo P95 xử lý đoạn, P95 trễ sau cuối đoạn, P95 thời điểm có chữ đầu và số đoạn xử lý lâu hơn thời lượng đoạn. Đây không phải phép đo microphone, native streaming hay logic của app.
-- CER dùng cùng chuẩn hóa WER, loại khoảng trắng, giữ dấu tiếng Việt; tổng hợp tổng lỗi ký tự/tổng ký tự. WER VI vẫn là đơn vị cách nhau bởi khoảng trắng.
-- Không so trực tiếp khác ngôn ngữ/giao thức/cấu hình. Không tự chọn người thắng. Các chỉ số chung dựa trên giao các mẫu thành công; thời gian/P95 trong bảng chính vẫn theo mẫu thành công của từng model. JSON có common_summary tương ứng.
-- Worker riêng: timer nhận dạng gồm IPC và giải mã audio. Mỗi worker load model một lần/lượt. Không đưa reference vào worker. Thư viện backend được lưu trong `runtime` của model.
-- Thời gian load không tính vào RTF; chưa warm-up riêng. Chưa đo RAM/VRAM hoặc tự tính tiền API.
-
-### Cloud tùy chọn
-
-ElevenLabs cần biến môi trường `ELEVENLABS_API_KEY`; Google cần Application Default Credentials, `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION` phù hợp Chirp 3. Google adapter dùng synchronous Recognize, giới hạn 60 giây/mẫu. Đặt biến trước khi khởi động server. Không nhập key vào model config; key không lưu trong JSON report. Chỉ gửi audio khi chọn model API và tick đồng ý cloud; có thể phát sinh phí. Chưa chạy kiểm chứng API với tài khoản thật.
-
-Nguồn tích hợp: [faster-whisper](https://github.com/SYSTRAN/faster-whisper), [PhoWhisper](https://huggingface.co/vinai/PhoWhisper-small), [Qwen3-ASR](https://huggingface.co/Qwen/Qwen3-ASR-0.6B), [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2), [Canary](https://huggingface.co/nvidia/canary-1b-v2), [SenseVoice](https://github.com/QwenAudio/SenseVoice), [MMS](https://huggingface.co/facebook/mms-1b-all), [Vosk](https://alphacephei.com/vosk/models), [ElevenLabs](https://elevenlabs.io/docs/api-reference/speech-to-text/convert), [Chirp](https://docs.cloud.google.com/speech-to-text/docs/models/chirp-3).
-
-## Chạy trên workspace hiện tại
-
-Từ thư mục VANGIA_PROJECT, chạy PowerShell:
+From the VANGIA_PROJECT workspace in PowerShell:
 
 ```powershell
 .\stt-benchmark\start.ps1
 ```
 
-Mở `http://127.0.0.1:8766`. Script ưu tiên `.venv` của tool, rồi dùng Python đã có trong app nếu tìm thấy. Đây chỉ là dùng chung môi trường thư viện, không phụ thuộc mã nguồn app. Có thể chạy trực tiếp:
+Open http://127.0.0.1:8766. The launcher prefers the tool's `.venv`, then the existing application environment. You can also run:
 
 ```powershell
 .\facial-cue-prototype\.venv\Scripts\python.exe .\stt-benchmark\server.py
 ```
 
-Dừng server bằng Ctrl+C trong terminal. Không dừng giữa benchmark nếu muốn giữ một lần chạy hoàn chỉnh. Lần chạy bị ngắt sẽ được đánh dấu khi khởi động lại; dữ liệu từng mẫu đã lưu được giữ lại. Chưa hỗ trợ tiếp tục đúng từ mẫu đang dở; tạo lần chạy mới để so sánh đầy đủ.
+Stop with Ctrl+C. Interrupted runs retain saved sample results and are marked on restart. Select the interrupted run in history and click **Resume interrupted run** to continue with its original dataset, configurations and options. Saved samples (including recorded errors) are retained; only missing samples run, and a sample interrupted before saving is processed again. The tool checks dataset hashes and creates an exact `run.before-resume-<id>.json` backup beside the report before resuming. Changed or missing data blocks resumption; only one run can be active. Keep model weights and Python environments unchanged for comparable measurements across restarts.
 
-## Môi trường riêng (tùy chọn)
-
-Python 3.10+:
+To create a separate server environment with Python 3.10+:
 
 ```powershell
 cd stt-benchmark
@@ -73,11 +29,9 @@ python -m venv .venv
 .\start.ps1
 ```
 
-Server/giao diện chỉ cần thư viện chuẩn Python; import audio cần PyAV. Model dùng backend tương ứng trong danh mục ở trên.
+## Prepare a dataset
 
-## Dataset
-
-Upload một ZIP:
+Upload a ZIP containing audio and matching UTF-8 reference transcripts:
 
 ```text
 english_pilot.zip
@@ -87,51 +41,100 @@ english_pilot.zip
   transcripts/EN002.txt
 ```
 
-- Nhận 1–1.000 cặp; không bắt buộc đủ 100 để thử quy trình.
-- ID audio/TXT giống nhau, phân biệt hoa/thường; không trùng ID ở thư mục khác. Không đặt EN001.mp3 và EN001.wav cùng một ZIP vì chúng trùng ID.
-- Nhận WAV, MP3, M4A, FLAC, OGG, OPUS, AAC, WebM; có thể trộn định dạng giữa các mẫu. File cần giải mã được và có đúng một audio stream. Đây không phải cam kết đọc mọi codec, file mã hóa hoặc file hỏng mang các đuôi này.
-- Tối đa 10 phút/mẫu sau giải mã, 128 MB/file nguồn. Giữ nguyên file gốc trong `originals/`; giải mã/downmix/resample một lần khi import thành WAV PCM16 mono 16 kHz trong `audio/`. Mọi model dùng cùng bản này; không tách người nói. Thời lượng tính từ số mẫu đã giải mã. Không áp dụng khử nhiễu hoặc tự tăng âm lượng.
-- Hash file gốc và bản đã chuyển đổi, thông số nguồn, cùng phiên bản xử lý audio được lưu trong manifest/report. Chuyển MP3 sang PCM không khôi phục thông tin đã mất do nén. Thời gian chuyển đổi khi import không nằm trong RTF model.
-- TXT UTF-8, chỉ chứa lời nói thực tế, không thêm nhãn vai nếu audio không đọc nhãn.
-- ZIP tối đa 512 MB; tổng dung lượng khai báo sau giải nén tối đa 1 GB; tổng audio chuẩn hóa tối đa 1 GB.
-- Nghe lại bản thu và sửa transcript trước khi chấm. Kịch bản AI chưa được nghe kiểm tra không phải đáp án chuẩn.
-- Bộ hiện tại: `../datasets/stt_english_ai70_general30_v1/conversations.md`. Thu thử EN001, EN027, EN053, EN070, EN074.
-- Import sao chép dữ liệu vào `data/datasets/<id>`; không chỉnh sửa bản gốc. Muốn sửa dữ liệu, chỉnh bộ nguồn rồi import phiên bản mới.
-- Dataset cũ vẫn chạy theo audio đã lưu trước đây. Nếu muốn so sánh tất cả theo quy trình chuẩn hóa mới, import lại nguồn thành phiên bản mới và chạy mọi model trên phiên bản đó.
+- Accepts 1-1,000 pairs. Matching IDs are case-sensitive and must be unique across directories. EN001.mp3 and EN001.wav in the same ZIP are duplicates.
+- Audio formats: WAV, MP3, M4A, FLAC, OGG, OPUS, AAC, WebM. Formats may be mixed. Each file must decode successfully and contain exactly one audio stream; not every codec/container variant is guaranteed.
+- Limits: 512 MB per ZIP, 1 GB declared expanded size, 128 MB per source audio file, 10 minutes per decoded sample, and 1 GB total normalized audio.
+- Originals are preserved in `originals/`. Import decodes, downmixes and resamples once into PCM16 mono 16 kHz WAV in `audio/`. All models receive the same normalized file. There is no denoising, automatic gain adjustment or speaker separation.
+- Source and normalized hashes, source properties and audio-processing versions are saved. Conversion cannot restore information lost by MP3 compression. Import conversion time is excluded from model RTF.
+- TXT files must contain the speech actually recorded. Omit speaker labels unless they are spoken. Listen to each recording and correct its reference before evaluation; an unchecked AI script is not ground truth.
+- Import copies files to `data/datasets/<id>`. To change references, edit your source and import a new dataset version. Previously imported datasets are not rewritten.
+- The prepared English scripts are in `../datasets/stt_english_ai70_general30_v1/conversations.md`. Start with a small reviewed pilot before recording all 100.
 
-## Model
+## Select models and run
 
-Lần chạy đầu tool dò hai thư mục `base.en`, `small.en` trong app hiện tại để tạo cấu hình. Không sao chép model. Bạn có thể nhập bất kỳ đường dẫn thư mục model tương thích CTranslate2/faster-whisper, hoặc tên model được backend hỗ trợ khi bật tải model.
+1. Select a dataset and review its audio and references.
+2. Choose **Benchmark scope**: manual selection, all compatible saved configurations, or all compatible catalog models plus saved configurations.
+3. Review the planned configurations and skipped entries. Enable weight downloads if needed. Confirm that references have been reviewed, then select **Run evaluation**.
+4. Export **Summary CSV** for one row per model, **Sample CSV** for sample details, or the full JSON report.
 
-Đường dẫn local được ưu tiên; mặc định không tải từ mạng. CUDA cần môi trường GPU phù hợp, tool sẽ báo lỗi nếu thiếu. Model tiếng Anh `.en` không dùng cho dataset tiếng Việt. Với tiếng Việt, chọn model đa ngôn ngữ.
+The catalog contains 38 presets across nine backends: Whisper, Distil-Whisper, PhoWhisper, Qwen3-ASR, Parakeet, Canary, SenseVoice, wav2vec2, MMS, Vosk and ElevenLabs/Google APIs. Catalog membership does not mean that weights are installed or that a checkpoint has been tested on this machine.
 
-Chọn một hoặc nhiều cấu hình để chạy tuần tự; nạp từng model một lần. Không đưa transcript chuẩn hoặc kịch bản vào prompt của model. Mỗi lần chạy lưu bản chụp cấu hình, ngôn ngữ, phiên bản dependencies, thông tin môi trường, hash dataset, transcript gốc và dự đoán.
+Batch selection filters by dataset language and prefers matching saved configurations. New catalog presets use CPU INT8 for faster-whisper and CPU float32 otherwise. Saved configurations retain their settings. Up to 50 configurations run sequentially; a model failure is recorded and the next model continues. Missing backends, recorded import failures and unconfigured/unauthorized cloud services are listed as skipped. Missing weights fail unless downloads are enabled. Dependencies and cloud permissions are never enabled automatically.
 
-## Diễn giải kết quả
+To customize a model, choose a catalog entry, click **Use this preset**, review the backend, Python executable, device, languages and model path, then **Save configuration**. English-only `.en` models cannot evaluate Vietnamese datasets. Use a compatible multilingual or Vietnamese checkpoint. Local paths must match the selected backend's model format. CUDA requires a suitable GPU environment.
 
-- WER = (substitutions + deletions + insertions) / số từ chuẩn, tổng hợp bằng tổng lỗi/tổng từ. Có thể lớn hơn 100% khi model thêm nhiều từ.
-- Chuẩn hóa NFKC, không phân biệt hoa/thường, phần lớn dấu câu thành khoảng trắng; giữ apostrophe và dấu tiếng Việt. Không chuyển `25` thành `twenty-five`: khác biệt biểu diễn số vẫn có thể được tính là lỗi. Chính sách được lưu cùng báo cáo.
-- Với tiếng Việt, cách chấm hiện tại tách theo khoảng trắng, gần mức âm tiết; không gọi đây là benchmark đã tách từ tiếng Việt theo ngôn ngữ học.
-- WER từng model chỉ tính các mẫu thành công. Báo cả số thành công/thất bại và WER trên giao các mẫu mọi model thành công, tránh xếp hạng lệch khi một model bỏ sót mẫu khó.
-- Thời gian nhận dạng bao gồm đọc/giải mã audio, VAD và tiêu thụ toàn bộ generator đầu ra; không gồm nạp model, hash input và chấm điểm. Không có warm-up riêng, nên mẫu đầu có thể chậm hơn. RTF = tổng thời gian nhận dạng thành công / tổng thời lượng audio tương ứng.
-- Không đo native streaming hoặc hành vi chia cửa sổ của app. Có tùy chọn chia đoạn cố định để đo mô phỏng như mô tả ở trên; không dùng gain, bộ lọc segment hay deduplication riêng của app.
-- Lưu đường dẫn model, không khóa revision của model remote và không hash toàn bộ weights. Để tái hiện chặt chẽ, dùng thư mục model local bất biến và lưu phiên bản nguồn tải bên ngoài.
-- Lưu `data/runs/<id>/run.json` sau mỗi mẫu; tải CSV hoặc JSON từ giao diện. Có thể dừng giữa các mẫu; không ngắt ngay tác vụ inference hoặc tải model đang chạy.
+On initial setup the tool detects existing base.en/small.en directories in the application without copying their weights. New Hugging Face downloads use `data/hf-cache`; legacy cached weights can still be read offline. Official Vosk aliases download and extract into `data/model-cache` when downloads are permitted, or you can provide an extracted model directory.
 
-## Thêm backend
+## Backend environments
 
-1. Viết adapter trong `benchmark/adapters.py` hoặc module khác, có `load()`, `transcribe(audio_path, language)`, `close()`.
-2. `transcribe` nhận audio, trả về `{"text": "...", "segments": [...]}`; không nhận reference.
-3. Đăng ký trong `ADAPTERS`, thêm validation/config UI cho backend mới.
-4. Dataset, chấm điểm, lưu báo cáo và so sánh tiếp tục dùng chung.
-
-## Kiểm tra
+Install individual backends from the workspace:
 
 ```powershell
-python -m unittest discover -s tests -v
-node --test tests/test_ui.cjs
+.\stt-benchmark\install-backend.ps1 -Backend transformers-whisper
+.\stt-benchmark\install-backend.ps1 -Backend vosk
+.\facial-cue-prototype\.venv\Scripts\python.exe .\stt-benchmark\check-backends.py
 ```
 
-Tests dùng dữ liệu tạm và adapter giả để kiểm tra scoring, ZIP validation, công bằng tập so sánh, lỗi model, persistence và HTTP. Không tạo kết quả nhận dạng giả dưới tên model thật.
+Backend keys: `faster-whisper`, `transformers-whisper`, `transformers-ctc`, `qwen-asr`, `nemo`, `sensevoice`, `vosk`, `elevenlabs`, `google-chirp`.
 
-JavaScript tests kiểm tra phối hợp request và trạng thái báo cáo, không thay thế kiểm tra trực quan bằng trình duyệt. Xem `QA_REPORT.md` để biết phạm vi đã kiểm chứng và giới hạn còn lại.
+The installer creates `.backends/<backend>`. Refresh the page and reselect a preset to fill its Python path, or provide your own local interpreter. Workers run on the same OS; automatic WSL/remote execution is not supported. Import results are stored in `data/backend-checks.json`, package versions in `data/backend-environments`, and checkpoint smoke results in `data/backend-smoke`.
+
+The tested machine uses a Ryzen 7 5800U (8 cores/16 threads), about 14 GiB RAM and integrated AMD graphics, without CUDA. Each local backend has a successful checkpoint smoke test, but not all catalog checkpoints have been validated. An import check does not prove sufficient memory or acceptable performance. See QA_REPORT.md for evidence and limits.
+
+## Metrics and measurement protocol
+
+- WER = (substitutions + deletions + insertions) / reference tokens. Corpus WER divides total errors by total reference tokens; it can exceed 100%.
+- Normalization uses NFKC, case folding and punctuation-to-space, while retaining apostrophes and Vietnamese accents. Numeric spellings are not unified: `20` and `twenty` can count as different words. Vietnamese WER uses whitespace-separated tokens, approximately syllables, rather than linguistic word segmentation.
+- CER uses the same normalization, removes whitespace, and divides total character errors by total reference characters.
+- Per-model scores include successful samples only. Common scores use the intersection of samples successful across every model. Check failure counts and coverage before comparing. If one model fails every sample, common scores can be unavailable; blank does not mean zero errors.
+- RTF = total successful inference time / corresponding audio duration. Inference includes audio decoding, VAD when enabled, consuming output generators, and worker IPC. API timing includes upload and provider response time. Loading, input hashing, scoring and import conversion are excluded. There is no separate warm-up; the first sample may be slower.
+- Whole-file mode passes the complete audio to the adapter. Transformers and SenseVoice split long audio into blocks of at most 30 seconds without overlap; boundaries can affect accuracy. CTC uses greedy decoding without an external language model. Whisper beam size is configurable; other backends use their default decoder.
+- Sequential-chunk mode decodes independent fixed 1-15 second chunks without overlap or cross-chunk context. A simulated single-worker queue uses `emitted_at = max(chunk_end, previous_emitted_at) + processing_time`, without sleeping in real time. Reports include nearest-rank P95 chunk processing time, lag after chunk end, first nonempty result time, and chunks slower than their audio duration. These are not native-streaming or microphone measurements.
+- Main timing/P95 columns use each model's successful samples. JSON also contains `common_summary`. Compare matching dataset versions, languages and protocols. RAM/VRAM and API costs are not measured.
+
+References are used only for scoring and are never sent to model workers. Reports snapshot configurations, protocol, environment/dependency versions, dataset hashes, references and predictions. Remote revisions are not pinned and full weight files are not hashed; use an immutable local model directory for stricter reproducibility.
+
+Results are saved after each sample in `data/runs/<id>/run.json`. Cancellation is checked between samples/chunks and cannot immediately interrupt loading, downloading or inference. Worker timeouts are 30 minutes for loading and 10 minutes per inference.
+
+## Optional cloud services
+
+ElevenLabs requires `ELEVENLABS_API_KEY`. Google requires Application Default Credentials, `GOOGLE_CLOUD_PROJECT` and a suitable `GOOGLE_CLOUD_LOCATION`. The Google adapter uses synchronous Recognize and limits samples to 60 seconds. Set credentials before starting the server; keys are not entered in model configurations or saved in reports. Audio is uploaded only when a cloud model is selected and cloud consent is checked. Charges may apply. Cloud packages have been imported, but live account requests have not been validated.
+
+## Extend and verify
+
+An adapter implements `load()`, `transcribe(audio_path, language)` and `close()`. Transcription returns `{"text": "...", "segments": [...]}` without receiving a reference. Register it in `ADAPTERS` and add backend configuration validation/UI support; dataset import, scoring and persistence remain shared.
+
+From `stt-benchmark`, using a Python environment with the tool dependencies:
+
+```powershell
+..\facial-cue-prototype\.venv\Scripts\python.exe -m unittest discover -s tests -v
+node --test tests/test_ui.cjs
+node --check web/app.js
+..\facial-cue-prototype\.venv\Scripts\python.exe tests/smoke_http.py --audio data/smoke/SMOKE001.mp3
+```
+
+Regression tests use temporary datasets and explicitly fake adapters to check scoring, validation, persistence and HTTP behavior. Real checkpoint smoke tests are documented separately. JavaScript tests use a minimal DOM/network harness and do not replace visual browser checks.
+
+
+## Vietnamese-English candidate sets
+
+Choose **Vietnamese / Vietnamese with English terms** when importing reviewed mixed-language audio. Preserve spoken English terms in the reference transcripts. These candidate lists are not claims of measured Vietnamese-English accuracy.
+
+In **Benchmark scope**, select:
+
+- **Vietnamese-English ? Video (5 candidates)**: Whisper large-v3, large-v2, Qwen3-ASR-1.7B, Qwen3-ASR-0.6B, PhoWhisper-large. The input protocol is whole file.
+- **Vietnamese-English ? Live (5 candidates)**: multilingual Whisper small, medium, Qwen3-ASR-0.6B, PhoWhisper-small, and Fun-ASR-MLT-Nano-2512. Run once with 1-second chunks, then start a separate run with 2-second chunks. This is independent-chunk simulation, not native streaming or microphone-to-screen latency.
+
+Each set uses one CPU baseline per candidate: 4 threads, INT8 with beam 5 and VAD for faster-whisper; float32 for other backends, beam 5 for Transformers Whisper and default decoding elsewhere. Saved configurations are deliberately not substituted. For custom settings or local checkpoint paths, use manual selection instead. Download permission starts off and is controlled by the existing checkbox.
+
+The plan lists cache hints and skipped backends. A detected cache is not proof of complete weights; loading validates the actual model. A missing cache may require downloading several GB. Missing backends are skipped, so check that all five candidates are included before making a five-model comparison.
+
+The new `fun-asr-mlt` backend uses the installed FunASR implementation, not downloaded Python code. It prefers `.backends/fun-asr-mlt` and can reuse `.backends/sensevoice` if present. To install a separate environment:
+
+```powershell
+.\stt-benchmark\install-backend.ps1 -Backend fun-asr-mlt
+```
+
+Use the exact checkpoint `FunAudioLLM/Fun-ASR-MLT-Nano-2512`, not the non-MLT Nano checkpoint. Its snapshot must include `Qwen3-0.6B/config.json`. This adapter uses float32, Vietnamese/English language prompts, deterministic decoding without ITN, and 30-second blocks for long files. Live simulation supplies shorter chunks. Its real checkpoint accuracy, memory use, and CPU latency still need measurement; registration and import checks are not inference validation.
+
+Existing datasets, configurations, and run reports are not migrated or rewritten by selecting these sets. New evaluations create new run IDs; interrupted-run resume remains available.

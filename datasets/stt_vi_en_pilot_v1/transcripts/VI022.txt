@@ -1,0 +1,7 @@
+Thưa thầy, con dùng WER và CER để so sánh prediction với reference như vậy có ổn không ạ?
+
+Được, miễn là reference đã được nghe lại và kiểm tra. Con cũng cần hiểu quy tắc chuẩn hóa của bộ chấm.
+
+Với tiếng Việt, con không nên diễn giải WER giống hệt tiếng Anh phải không thầy?
+
+Đúng. Con phải xem cách bộ chấm tách từ và dùng thêm CER để có góc nhìn bổ sung.

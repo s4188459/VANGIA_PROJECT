@@ -1,0 +1,7 @@
+Thầy ơi, sau vòng đầu con có cần thử mọi cấu hình của tất cả model không ạ?
+
+We do not need to test every possible configuration at once.
+
+Vậy con chọn vài ứng viên tốt rồi thay từng yếu tố để hiểu kết quả nhé thầy?
+
+Đúng rồi con. Save the original reports, document the settings, and use new recordings for the final evaluation.

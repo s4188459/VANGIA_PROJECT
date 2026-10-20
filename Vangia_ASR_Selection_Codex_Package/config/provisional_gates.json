@@ -1,0 +1,31 @@
+{
+  "version": "0.1-PROPOSAL-NOT-VALIDATED",
+  "owner": null,
+  "approval_date": null,
+  "research_verified_as_universal_standard": false,
+  "stage": "exploratory_only",
+  "live": {
+    "wer_micro_max": {"value": 0.15, "evidence_class": "P", "rationale": "project's provisional target, not a peer-reviewed general acceptability standard", "requires_human_validation": true},
+    "p95_word_first_presented_lag_s_max": {"value": 3.0, "evidence_class": "P", "rationale": "project's nominal ~2–3 second goal, not measured or externally established", "requires_true_presentation_measurement": true},
+    "paint_proxy_alternative": {"allowed_for_exploration": true, "can_qualify_final_pass": false},
+    "speech_coverage_min": null,
+    "backlog_slope_max_s_per_min": null,
+    "critical_error_rate_max": null,
+    "transcript_revision_rate_max": null,
+    "dropout_rate_max": null,
+    "user_comprehension_target": null
+  },
+  "offline": {
+    "wer_micro_max": null,
+    "critical_error_rate_max": null,
+    "max_end_to_end_turnaround_s": null,
+    "resource_budget_peak_rss_bytes": null,
+    "improvement_over_live_required": null
+  },
+  "decision_policy": {
+    "unapproved_threshold_status": "PROVISIONAL_EXPLORATORY_ONLY",
+    "required_validation_dimensions": ["held_out_live_accuracy", "true_or_qualified_display_timing", "completeness", "stability", "technical_critical_error_review", "reliability", "resources", "human_task_utility", "reproducibility"],
+    "missing_measurement_prevents_validated": true,
+    "block_model_if_required_worker_unavailable": false
+  }
+}

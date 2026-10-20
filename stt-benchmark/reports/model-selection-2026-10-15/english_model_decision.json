@@ -1,0 +1,136 @@
+{
+  "title": "Provisional English STT candidate shortlist",
+  "status": "Exploratory shortlist only; no final model or two-model architecture selected",
+  "scope": "English evidence only. Vietnamese requires separate data and screening.",
+  "evidence": {
+    "run_id": "e634c257ef69434383d580442820821e",
+    "sample_count": 100,
+    "duration_minutes": 51.86559583333334,
+    "protocol": "full-file-v1",
+    "source_files": [
+      "Testing_STT_Model_English_Version.csv",
+      "STT-EN.json"
+    ]
+  },
+  "decision_correction": "Earlier Parakeet-live / Whisper-large-v3-final assignments were provisional. The available dataset and single whole-file run are insufficient for a final deployment decision.",
+  "provisional_live_accuracy_target": "Corpus WER <= 15%; explicitly retain small.en and small as near-threshold comparison candidates, not accepted configurations.",
+  "live_candidates": [
+    {
+      "label": "parakeet-tdt-0.6b-v2",
+      "checkpoint": "nvidia/parakeet-tdt-0.6b-v2",
+      "backend": "nemo",
+      "observed_wer": 0.11285828025477707,
+      "observed_cer": 0.05844946025515211,
+      "observed_rtf": 0.2533924505028739,
+      "reason_for_retest": "Strong preliminary speed/accuracy tradeoff; test actual live latency."
+    },
+    {
+      "label": "parakeet-tdt-0.6b-v3 [catalog]",
+      "checkpoint": "nvidia/parakeet-tdt-0.6b-v3",
+      "backend": "nemo",
+      "observed_wer": 0.12679140127388536,
+      "observed_cer": 0.05899901864573111,
+      "observed_rtf": 0.26554402146638667,
+      "reason_for_retest": "Nearby alternative; one run is insufficient to exclude it."
+    },
+    {
+      "label": "Qwen3-ASR-0.6B",
+      "checkpoint": "Qwen/Qwen3-ASR-0.6B",
+      "backend": "qwen-asr",
+      "observed_wer": 0.10071656050955415,
+      "observed_cer": 0.04553483807654563,
+      "observed_rtf": 0.742355131014516,
+      "reason_for_retest": "Lower offline WER; check whether live latency remains acceptable."
+    },
+    {
+      "label": "small.en",
+      "checkpoint": "D:\\@_Binh's document\\AI Course\\VANGIA_PROJECT\\facial-cue-prototype\\models\\faster-whisper-small-en",
+      "backend": "faster-whisper",
+      "observed_wer": 0.15187101910828024,
+      "observed_cer": 0.07685966633954858,
+      "observed_rtf": 0.20015926553110713,
+      "reason_for_retest": "Boundary candidate: WER 15.19% exceeds the provisional 15% threshold; not currently a passing configuration."
+    },
+    {
+      "label": "small [catalog]",
+      "checkpoint": "small",
+      "backend": "faster-whisper",
+      "observed_wer": 0.15425955414012738,
+      "observed_cer": 0.0775269872423945,
+      "observed_rtf": 0.2752490816367218,
+      "reason_for_retest": "Boundary candidate: WER 15.43%; retain to compare the multilingual checkpoint, with Vietnamese evaluation still required."
+    }
+  ],
+  "final_candidates": [
+    {
+      "label": "large-v3 [catalog]",
+      "checkpoint": "large-v3",
+      "backend": "faster-whisper",
+      "observed_wer": 0.09136146496815287,
+      "observed_cer": 0.04561334641805692,
+      "observed_rtf": 1.4236154365654958,
+      "reason_for_retest": "Lowest observed WER; test robustness on more speakers and conditions."
+    },
+    {
+      "label": "large-v2 [catalog]",
+      "checkpoint": "large-v2",
+      "backend": "faster-whisper",
+      "observed_wer": 0.09812898089171974,
+      "observed_cer": 0.05197252208047105,
+      "observed_rtf": 1.5071397902414847,
+      "reason_for_retest": "Close accuracy baseline; verify whether the v3 advantage persists."
+    },
+    {
+      "label": "Qwen3-ASR-0.6B",
+      "checkpoint": "Qwen/Qwen3-ASR-0.6B",
+      "backend": "qwen-asr",
+      "observed_wer": 0.10071656050955415,
+      "observed_cer": 0.04553483807654563,
+      "observed_rtf": 0.742355131014516,
+      "reason_for_retest": "Competitive WER and lowest observed CER; potential single-model solution."
+    },
+    {
+      "label": "canary-1b-v2 [catalog]",
+      "checkpoint": "nvidia/canary-1b-v2",
+      "backend": "nemo",
+      "observed_wer": 0.10151273885350319,
+      "observed_cer": 0.04891069676153091,
+      "observed_rtf": 1.069143471197955,
+      "reason_for_retest": "Close WER alternative for independent comparison."
+    },
+    {
+      "label": "turbo [catalog]",
+      "checkpoint": "turbo",
+      "backend": "faster-whisper",
+      "observed_wer": 0.10688694267515923,
+      "observed_cer": 0.05209028459273798,
+      "observed_rtf": 1.005110432019682,
+      "reason_for_retest": "Whisper-family speed/accuracy alternative; repeat with the target deployment."
+    }
+  ],
+  "retry_after_environment_fix": [
+    {
+      "checkpoint": "Qwen/Qwen3-ASR-1.7B",
+      "reason": "Windows privilege/symlink failure; accuracy unknown."
+    },
+    {
+      "checkpoint": "facebook/mms-1b-all",
+      "reason": "Backend timeout; accuracy unknown."
+    }
+  ],
+  "next_tool_requirements": [
+    "Treat model + backend + precision + decoder + hardware as a configuration; snapshot each run.",
+    "Evaluate actual live capture-to-caption P50/P95, time to first text, finalization delay, queue growth, transcript revisions and dropouts. Label fixed-chunk simulation separately.",
+    "For final transcripts, measure corpus WER/CER, sample failure coverage, technical terms, numbers, omissions and silence hallucinations.",
+    "Add more speakers, accents, recording conditions, noise, long sessions and interruptions; review references against audio. Record speaker and recording-session IDs.",
+    "Use speaker/session-separated development and held-out evaluation sets. Do not tune and declare a winner on the same 100 examples.",
+    "Repeat timing runs, separate loading from inference, record peak memory and variability. Where available use paired sample/speaker-aware uncertainty estimates for accuracy.",
+    "Evaluate English and Vietnamese separately; these English results do not establish language eligibility or quality for Vietnamese.",
+    "Compare one-model and two-model workflows; select two models only if the final quality gain justifies the extra cost.",
+    "Do not score failed model loading as bad recognition or zero error; retry environment failures separately."
+  ],
+  "final_selection": null,
+  "selection_status": "withdrawn",
+  "withdrawn_on": "2026-10-20",
+  "status_note": "Historical evidence only; recommendations are obsolete. Model selection is pending in Vangia ASR Lab."
+}

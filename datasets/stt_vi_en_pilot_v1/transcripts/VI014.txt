@@ -1,0 +1,7 @@
+Thưa thầy, learning rate có vai trò gì trong gradient descent ạ?
+
+Nó ảnh hưởng đến độ lớn của bước cập nhật. Nếu đặt quá lớn, loss có thể dao động và khó giảm ổn định.
+
+Còn nếu con đặt learning rate quá nhỏ thì model sẽ học chậm hơn phải không thầy?
+
+Có thể như vậy. Con thử một vài mức hợp lý rồi so sánh cả tốc độ học lẫn kết quả trên dữ liệu kiểm tra.

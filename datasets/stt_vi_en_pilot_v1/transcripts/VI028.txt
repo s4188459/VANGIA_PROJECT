@@ -1,0 +1,7 @@
+Thầy ơi, con muốn chữ xuất hiện sau khoảng hai đến ba giây thì phải đo từ lúc nào ạ?
+
+Measure the delay from the spoken words to the visible text, not just the model processing time.
+
+Nếu chữ tạm thời còn thay đổi thì con ghi thời gian xuất hiện và thời gian chốt riêng nhé thầy?
+
+Đúng rồi con. We should report both the first result and the finalized transcript.

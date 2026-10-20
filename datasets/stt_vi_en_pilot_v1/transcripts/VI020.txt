@@ -1,0 +1,7 @@
+Thưa thầy, khi làm streaming thì con đo tổng thời gian xử lý là đủ chưa ạ?
+
+Chưa đủ. Con cần đo latency, vì audio còn có thể chờ trong buffer trước khi tạo thành một chunk.
+
+Nếu chunk mới đến nhanh hơn tốc độ model xử lý thì hàng đợi sẽ dài dần đúng không thầy?
+
+Đúng. Khi đó chữ hiển thị sẽ ngày càng chậm so với lời nói, dù chương trình vẫn tiếp tục chạy.

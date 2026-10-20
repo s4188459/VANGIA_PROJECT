@@ -1,0 +1,3 @@
+sample_id,audio_path,reference_path,domain,speaker_id,session_id,split,language,reference_quality
+EN001,audio/EN001.m4a,scripts/EN001.txt,classroom,speaker-01,session-01,development,en,unverified
+EN002,audio/EN002.wav,scripts/EN002.txt,classroom,speaker-01,session-01,development,en,unverified

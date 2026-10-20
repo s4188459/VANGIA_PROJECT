@@ -1,0 +1,7 @@
+Thầy ơi, training loss của con giảm nhưng validation loss lại tăng. Model có đang tốt lên không ạ?
+
+Chưa chắc đâu con. Đây có thể là dấu hiệu overfitting, nên con cần kiểm tra lại dữ liệu và quá trình học.
+
+Con có thể thử regularization và dừng sớm để xem tình hình có cải thiện không thầy?
+
+Được. Con thay từng yếu tố một và giữ cách đánh giá nhất quán để hiểu tác động của mỗi thay đổi.
