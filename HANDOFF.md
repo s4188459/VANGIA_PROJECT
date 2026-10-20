@@ -1,7 +1,7 @@
 # Machine handoff ? 2026-10-20
 
 Model selection is pending. Previous model recommendations are withdrawn.
-Continue evaluation in `vangia-asr-lab/`; see its README and IMPLEMENTATION_STATUS.
+Continue evaluation in `vangia-asr-lab/`; see its README and the three documents in `docs/stt/`.
 The old web benchmark remains available for explicit model comparisons. Historical
 experiment implementations and reports are retained only for reproducibility.
 The facial collector uses its earlier prototype defaults, not a newly selected model.
@@ -17,5 +17,5 @@ The facial collector uses its earlier prototype defaults, not a newly selected m
 Git does not transfer model weights, virtual environments, recordings, local run
 folders, benchmark data/cache, backups, or the original TEST (3).zip input archive.
 Copy any needed data separately before leaving the old machine. Source code,
-configuration templates, tests, curated reports and source-package documents are
+configuration templates, tests, preliminary evidence and the three STT documents are
 included. No new model has been approved by this handoff.
