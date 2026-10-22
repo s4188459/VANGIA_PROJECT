@@ -53,8 +53,8 @@ INT8 versus NeMo/Qwen float32). The run was interrupted and resumed. Timing is
 historical whole-file evidence, not a controlled repeated latency study.
 
 Qwen3-ASR-1.7B failed with a Windows privilege error; MMS-1B-all hit a backend
-timeout. Neither has a valid accuracy score. Their failure is not evidence of
-poor recognition quality. The CSV's common-sample intersection is zero because
+timeout in the original run. They had no valid accuracy scores at that point;
+the successful recovery results are recorded below. The CSV's common-sample intersection is zero because
 it includes these failed configurations; each successful configuration completed
 100 samples.
 
@@ -62,5 +62,33 @@ No live word-display delay was established. RTF below 1 does not prove that
 captions meet a latency target, and 100% minus WER is not comprehension accuracy.
 These recordings were used for screening and cannot become an untouched final
 test set. Local checkpoint aliases still require revision/hash verification.
+
+## Recovery results (reviewed 2026-10-22)
+
+Both previously failed configurations now completed all 100 original samples,
+with zero failed samples. The original 27-row table and CSV remain unchanged as
+historical evidence. Combined with this recovery, all 27 configurations now have
+completed preliminary accuracy results. This is still old-tool screening, not
+completion of the new tool's focused evaluation.
+
+| Model | Completed | WER (%) | CER (%) | Timing interpretation |
+|---|---:|---:|---:|---|
+| Qwen3-ASR-1.7B | 100/100 | 8.2006 | 3.7095 | Raw RTF 31.4605 is distorted by an extreme elapsed-time observation; rerun timing before speed comparisons |
+| MMS-1B-all | 100/100 | 37.7588 | 14.4887 | Raw RTF 1.3570; resumed across load sessions |
+
+[Recovery summary CSV](evidence/recovery-summary.csv) records the run ID and the
+largest per-sample elapsed time. Full local results are in
+`stt-benchmark/data/recovery/runs/f852e28a74ed495d9beeb23cfac51b67/run.json`.
+The retry retained 118 successful observations and filled 82 rows skipped after
+a Windows result-file replacement failure. Dataset hashes were checked before
+resuming. WER is pooled over all 100 samples per model (5,024 reference words).
+
+Qwen's maximum sample elapsed time is about 91,077 seconds (25.3 hours). Its cause
+has not been established; do not interpret this as normal decoder speed or silently
+remove it. Timing combines different load sessions and uncontrolled machine state.
+The full hypotheses can be scored, but latency/speed claims need a controlled rerun.
+
+Qwen 1.7B has the lowest observed WER among these 27 preliminary configurations;
+this does not establish a final deployment winner or live suitability.
 
 Next: [candidate shortlist](02-candidate-shortlist.md).

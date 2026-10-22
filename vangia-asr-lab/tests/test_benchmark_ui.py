@@ -80,3 +80,26 @@ def test_workflow_cli_preview_import_run_and_export(tmp_path,capsys):
     assert main(['benchmark-run',str(tmp_path/'bench')])==3
     assert main(['export-analysis',str(tmp_path/'bench'),'--out',str(tmp_path/'export')])==0
     assert main(['validate-export',str(tmp_path/'export')])==0
+
+
+@pytest.mark.skipif(os.environ.get('ASRLAB_TEST_UI')!='1',reason='Native desktop opt-in')
+def test_simple_groups_include_qwen17_offline_and_keep_live_scope():
+    import tkinter as tk
+    from types import SimpleNamespace
+    from asrlab.benchmark_ui import BenchmarkWizard
+    root=tk.Tk();root.withdraw()
+    try:
+        wizard=BenchmarkWizard(SimpleNamespace(root=root))
+        root.update()
+        assert len(wizard.tabs.tabs())==3
+        assert len(wizard.model_tree.selection())==6
+        assert 'Qwen/Qwen3-ASR-1.7B' in wizard.model_tree.selection()
+        assert wizard.mode.get()=='batch_file'
+        wizard.choose_group('live')
+        assert len(wizard.model_tree.selection())==5
+        assert 'Qwen/Qwen3-ASR-1.7B' not in wizard.model_tree.selection()
+        assert wizard.mode.get()=='paced_replay'
+        wizard.tabs.select(wizard.models_frame);root.update()
+        assert wizard.run_buttons[0].winfo_ismapped()
+        wizard.close()
+    finally:root.destroy()

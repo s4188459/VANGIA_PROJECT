@@ -42,7 +42,7 @@ def test_presets_exact_scope_deferred_and_separate_worker_config(tmp_path):
     from asrlab.benchmark import preset,create_benchmark
     from asrlab.runner import decoder_config
     with pytest.raises(ValueError):preset('openai/whisper-base')
-    cfg=preset('Qwen/Qwen3-ASR-1.7B')
+    cfg=preset('facebook/mms-1b-all')
     with pytest.raises(ValueError,match='opt-in'):create_benchmark(dataset(tmp_path),[cfg],tmp_path/'campaign')
     clean=decoder_config({'model_id':'openai/whisper-small.en','samples':[{'text':'SECRET'}],
         'reference':'SECRET','dataset_manifest':'SECRET','beam_size':5,'weights_path':'weights'})

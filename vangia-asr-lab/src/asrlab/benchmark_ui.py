@@ -19,7 +19,7 @@ from .progress import snapshot, TERMINAL
 class BenchmarkWizard:
     def __init__(self,app,source=None):
         self.app=app;self.window=tk.Toplevel(app.root);self.window.title('Vangia — New benchmark / Analysis')
-        self.window.geometry('1280x850');self.window.minsize(1000,680)
+        self.window.geometry('1120x780');self.window.minsize(960,680)
         self.busy=False;self.queue=queue.Queue();self.dataset=None;self.mapping=None;self.silence_ids=set();self.source=None
         self.presets=local_presets();self.preview=None;self.results=None;self.input_identity=None
         self.monitor_busy=False;self.monitor_next=0;self.monitor_source=None;self.monitor_data=None
@@ -70,16 +70,34 @@ class BenchmarkWizard:
         tree.configure(yscrollcommand=y.set,xscrollcommand=x.set);y.pack(side='right',fill='y');x.pack(side='bottom',fill='x');tree.pack(fill='both',expand=True)
         return tree
 
+    def advanced_section(self,parent,label='Advanced settings'):
+        container=ttk.Frame(parent);container.pack(fill='x',pady=3)
+        body=ttk.Frame(container,padding=5)
+        def toggle():
+            if body.winfo_manager():body.pack_forget()
+            else:body.pack(fill='x')
+        ttk.Button(container,text=label,command=toggle).pack(anchor='w')
+        return body
+
+    def choose_group(self,role):
+        self.mode.set('paced_replay' if role=='live' else 'batch_file')
+        ids=[m['canonical_model_id'] for m in registry()['models'] if role in m['roles']]
+        self.select_models(ids)
+        self.status.set(f'{len(ids)} {role} candidates selected. Check setup, then start. You can adjust the selection.')
+
     def build_input(self):
         self.entry(self.input_frame,'ZIP audio + TXT',self.archive_path,lambda:self.choose_file(self.archive_path,[('ZIP','*.zip')]))
-        self.entry(self.input_frame,'Metadata CSV (optional)',self.metadata_path,lambda:self.choose_file(self.metadata_path,[('CSV','*.csv')]))
-        self.entry(self.input_frame,'Local consent record ID',self.consent)
-        self.entry(self.input_frame,'New dataset folder',self.dataset_path)
-        self.buttons(self.input_frame,[('Inspect ZIP',self.inspect_archive),('Edit selected pairing',self.edit_pairing),
-            ('Confirm selected silence',self.confirm_silence),('Import & validate',lambda:self.background(self.import_data))])
-        ttk.Label(self.input_frame,text='WAV / M4A / MP3 / FLAC + UTF-8 TXT. Unknown speaker/session stays unknown. Missing reference is not silence.').pack(anchor='w',pady=5)
+        self.entry(self.input_frame,'Consent record ID',self.consent)
+        self.buttons(self.input_frame,[('1. Check ZIP',self.inspect_archive),('2. Use this dataset',lambda:self.background(self.import_data))])
+        extra=self.advanced_section(self.input_frame,'Pairing and storage options')
+        self.entry(extra,'Metadata CSV (optional)',self.metadata_path,lambda:self.choose_file(self.metadata_path,[('CSV','*.csv')]))
+        self.entry(extra,'Dataset folder',self.dataset_path)
+        self.buttons(extra,[('Edit selected pairing',self.edit_pairing),('Confirm selected silence',self.confirm_silence)])
+        ttk.Label(self.input_frame,text='Choose a ZIP with matching audio and TXT files. Check the pairs, then continue.').pack(anchor='w',pady=5)
         self.preview_tree=self.tree(self.input_frame,[('id','Sample'),('audio','Audio path'),('reference','Reference path'),('duration','Seconds'),
             ('language','Language'),('domain','Domain'),('speaker','Speaker'),('session','Session'),('split','Split'),('errors','Errors / warnings')])
+
+        self.preview_tree.configure(displaycolumns=('id','audio','reference','errors'))
 
     def choose_file(self,var,types):
         path=filedialog.askopenfilename(parent=self.window,filetypes=types)
@@ -138,28 +156,41 @@ class BenchmarkWizard:
         self.mode=tk.StringVar(value='batch_file');self.repeats=tk.IntVar(value=1);self.seed=tk.IntVar(value=42)
         self.chunk=tk.DoubleVar(value=2);self.overlap=tk.DoubleVar(value=0)
         self.deferred=tk.BooleanVar(value=False)
-        controls=ttk.Frame(self.models_frame);controls.pack(fill='x')
+        self.buttons(self.models_frame,[('Offline group (6)',lambda:self.choose_group('offline')),('Live group (5)',lambda:self.choose_group('live'))])
+        extra=self.advanced_section(self.models_frame,'Advanced run settings')
+        controls=ttk.Frame(extra);controls.pack(fill='x')
         for label,var,values in [('Mode',self.mode,['batch_file','paced_replay'])]:
             ttk.Label(controls,text=label).pack(side='left');ttk.Combobox(controls,textvariable=var,values=values,state='readonly',width=18).pack(side='left',padx=5)
         for label,var in [('Repeats',self.repeats),('Seed',self.seed),('Chunk seconds',self.chunk),('Overlap',self.overlap)]:
             ttk.Label(controls,text=label).pack(side='left',padx=4);ttk.Entry(controls,textvariable=var,width=6).pack(side='left')
-        ttk.Checkbutton(self.models_frame,text='Explicitly enable deferred diagnostic models',variable=self.deferred,command=self.populate_models).pack(anchor='w',pady=5)
-        ttk.Label(self.models_frame,text='Select multiple rows with Ctrl / Shift. Each repeat loads a fresh worker; OS caches uncontrolled. No native streaming claim.').pack(anchor='w')
+        ttk.Checkbutton(extra,text='Show diagnostic models (MMS)',variable=self.deferred,command=self.populate_models).pack(anchor='w',pady=5)
+        ttk.Label(self.models_frame,text='Choose a group above, or click model rows to select them. Setup status is checked before inference.').pack(anchor='w')
         self.model_tree=self.tree(self.models_frame,[('model','Checkpoint'),('backend','Backend'),('precision','Precision'),('device','Device'),('weights','Local weights'),('status','Preflight')],height=7)
         self.model_tree.column('model',width=270);self.model_tree.column('weights',width=300)
-        self.buttons(self.models_frame,[('Configure selected model',self.configure_model),('Check prerequisites',self.check_models),('View / save advanced config',self.advanced),('Save config JSON files',self.save_configs)])
-        self.entry(self.models_frame,'New benchmark folder',self.benchmark_path)
-        actions=self.buttons(self.models_frame,[('Start benchmark',self.start_benchmark),('Resume saved benchmark',self.resume_dialog),('Cancel',self.cancel)])
+        self.model_tree.configure(displaycolumns=('model','status'),selectmode='extended')
+        self.model_tree.bind('<Button-1>',self.toggle_model)
+        self.buttons(self.models_frame,[('Check setup',self.check_models),('Configure model',self.configure_model)])
+        self.buttons(extra,[('Edit config JSON',self.advanced),('Save config files',self.save_configs)])
+        self.entry(extra,'Benchmark folder',self.benchmark_path)
+        actions=self.buttons(self.models_frame,[('Start benchmark',self.start_benchmark),('Resume saved benchmark',self.resume_dialog)])
         self.run_buttons=list(actions.winfo_children())[:2]
         self.progress=ttk.Progressbar(self.models_frame,mode='determinate');self.progress.pack(fill='x',pady=4)
         self.populate_models()
+        self.choose_group('offline')
+
+    def toggle_model(self,event):
+        key=self.model_tree.identify_row(event.y)
+        if key:
+            if key in self.model_tree.selection():self.model_tree.selection_remove(key)
+            else:self.model_tree.selection_add(key)
+            return 'break'
 
     def populate_models(self):
         self.model_tree.delete(*self.model_tree.get_children())
         for m in registry()['models']:
             if 'diagnostic_retry' in m['roles'] and not self.deferred.get():continue
             key=m['canonical_model_id'];c=self.presets[key]
-            self.model_tree.insert('','end',iid=key,values=(key,c['backend'],c['precision'],c['device'],c.get('weights_path') or 'Not configured','NOT CHECKED'))
+            self.model_tree.insert('','end',iid=key,values=(key,c['backend'],c['precision'],c['device'],c.get('weights_path') or 'Not configured','Configured - check setup' if c.get('weights_path') and c.get('artifact_provenance') else 'Setup needed'))
 
     def select_models(self,ids):self.model_tree.selection_set(ids)
 
@@ -255,10 +286,11 @@ class BenchmarkWizard:
         threading.Thread(target=work,daemon=True).start()
 
     def build_results(self):
-        bar=self.buttons(self.results_frame,[('Open saved benchmark / run',self.open_source_dialog),('Refresh',self.refresh_results),
-            ('Export analysis bundle',self.export_dialog),('Compare 2 selected runs',self.compare_selected),('Open result folder',self.open_folder),('Review selected run',self.review_run)])
+        self.buttons(self.results_frame,[('Open results',self.open_source_dialog),('Export results',self.export_dialog)])
+        extra=self.advanced_section(self.results_frame,'More analysis options')
+        self.buttons(extra,[('Refresh',self.refresh_results),('Compare 2 runs',self.compare_selected),('Open folder',self.open_folder),('Detailed review',self.review_run)])
         self.filters={k:tk.StringVar() for k in ('run','model','domain','status')}
-        filters=ttk.Frame(self.results_frame);filters.pack(fill='x',pady=4)
+        filters=ttk.Frame(extra);filters.pack(fill='x',pady=4)
         for k,var in self.filters.items():
             ttk.Label(filters,text=k.title()).pack(side='left',padx=3)
             entry=ttk.Entry(filters,textvariable=var,width=16);entry.pack(side='left');entry.bind('<KeyRelease>',lambda e:self.render_results())
@@ -267,6 +299,7 @@ class BenchmarkWizard:
         ttk.Label(self.results_frame,textvariable=self.caption,wraplength=1150,font=('Segoe UI',13)).pack(fill='x',pady=8)
         self.result_tree=self.tree(self.results_frame,[('model','Model'),('config','Config / Repeat'),('mode','Mode'),('status','Status'),
             ('done','Completed/Total'),('wer','WER'),('cer','CER'),('rtf','RTF'),('turnaround','Turnaround s'),('ram','Peak RAM MiB'),('endpoint','Latency endpoint'),('coverage','Coverage')],height=5)
+        self.result_tree.configure(displaycolumns=('model','status','done','wer','rtf'))
         self.result_tree.bind('<<TreeviewSelect>>',lambda e:self.show_samples())
         self.sample_tree=self.tree(self.results_frame,[('id','Sample'),('domain','Domain'),('status','Status'),('wer','WER'),('sdi','S / D / I'),('reason','Missing / failure reason')],height=5)
         self.sample_tree.bind('<<TreeviewSelect>>',lambda e:self.show_transcript())
@@ -409,7 +442,12 @@ class BenchmarkWizard:
         if not selected:raise ValueError('Select a run')
         self.app.run_dir=Path(self.results['provenance'][int(selected[0])]['source_path'])
         if not (self.app.run_dir/'manifest.json').exists():raise ValueError('Job has not produced a run; its planned/cancelled rows remain exportable')
-        self.app.refresh();self.app.tabs.select(self.app.frames['review']);self.app.root.lift()
+        if getattr(self.app,'simple_mode',False):
+            from .ui import LabApp
+            review=LabApp(tk.Toplevel(self.window),self.app.run_dir)
+            review.tabs.select(review.frames['review'])
+        else:
+            self.app.refresh();self.app.tabs.select(self.app.frames['review']);self.app.root.lift()
 
     def compare_selected(self):
         selected=self.result_tree.selection()
@@ -476,3 +514,4 @@ class BenchmarkWizard:
             self.cancel();self.window.after(300,self.close)
         else:
             self.window.after_cancel(self.timer);self.window.destroy()
+            if getattr(self.app,'simple_mode',False):self.app.root.destroy()

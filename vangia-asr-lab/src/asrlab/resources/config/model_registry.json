@@ -10,8 +10,8 @@
   "legacy_run_mode": "final",
   "legacy_protocol": "full-file-v1",
   "legacy_chunk_seconds_option_not_proof_of_live": 3,
-  "primary_checkpoint_count": 9,
-  "diagnostic_retry_count": 2,
+  "primary_checkpoint_count": 10,
+  "diagnostic_retry_count": 1,
   "models": [
     {
       "key": "parakeet_v2",
@@ -262,7 +262,7 @@
       "canonical_model_id": "Qwen/Qwen3-ASR-1.7B",
       "model_card_url": "https://huggingface.co/Qwen/Qwen3-ASR-1.7B",
       "roles": [
-        "diagnostic_retry"
+        "offline"
       ],
       "legacy_label": "Qwen3-ASR-1.7B [catalog]",
       "legacy_checkpoint_selector": "Qwen/Qwen3-ASR-1.7B",
@@ -281,8 +281,15 @@
       "legacy_load_s": null,
       "legacy_error": "OSError: [WinError 1314] A required privilege is not held by the client: '..\\\\..\\\\blobs\\\\a6344aac8c09253b3b630fb776ae94478aa0275b' -> \"D:\\\\@_Binh's document\\\\AI Course\\\\VANGIA_PROJECT\\\\stt-benchmark\\\\data\\\\hf-cache\\\\models--Qwen--Qwen3-ASR-1.7B\\\\snapshots\\\\7278e1e70fe206f11671096ffdd38061171dd6e5\\\\.gitattributes\"",
       "historical_replay_type": "whole-file-v1",
-      "notes": "blocked in legacy due to Windows privilege error",
-      "checkpoint_resolution_status": "model-id-recorded-no-revision"
+      "notes": "Promoted to offline candidate after 100/100 recovery; timing requires controlled retest.",
+      "checkpoint_resolution_status": "model-id-recorded-no-revision",
+      "recovery_result": {
+        "run_id": "f852e28a74ed495d9beeb23cfac51b67",
+        "completed": 100,
+        "wer": 0.08200636942675159,
+        "cer": 0.03709519136408243,
+        "timing_valid_for_comparison": false
+      }
     },
     {
       "key": "mms_1b",

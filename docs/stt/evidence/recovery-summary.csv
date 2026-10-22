@@ -1,0 +1,3 @@
+﻿model,completed,failed,wer,cer,raw_rtf,max_sample_id,max_sample_elapsed_s,run_id,timing_note
+Qwen3-ASR-1.7B [catalog] [recovery],100,0,0.08200636942675159,0.03709519136408243,31.46053253705506,EN095,91077.1721075,f852e28a74ed495d9beeb23cfac51b67,Resumed across load sessions; Qwen contains extreme elapsed-time observation. Not a controlled timing comparison.
+mms-1b-all [catalog] [recovery],100,0,0.3775875796178344,0.14488714425907753,1.3569821243255293,EN088,57.08276489999844,f852e28a74ed495d9beeb23cfac51b67,Resumed across load sessions; Qwen contains extreme elapsed-time observation. Not a controlled timing comparison.

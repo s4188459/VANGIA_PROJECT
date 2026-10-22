@@ -42,7 +42,7 @@ def test_original_evidence_parity(tmp_path):
         assert rows[label]['error']
     assert len(result['candidates']) == 11
     assert sum('live' in c['roles'] for c in result['candidates']) == 5
-    assert sum('offline' in c['roles'] for c in result['candidates']) == 5
+    assert sum('offline' in c['roles'] for c in result['candidates']) == 6
     assert (tmp_path/'run/report.html').is_file()
     assert (tmp_path/'run/evidence.sqlite').is_file()
     from asrlab.storage import audit

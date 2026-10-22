@@ -63,7 +63,8 @@ def test_progressive_plan_never_adds_candidates_or_deferred_by_default():
     p=m.plan(ROOT/'config/experiment_matrix.json',seed=42)
     assert p['seed']==42
     assert len({j['job_id'] for j in p['jobs']})==len(p['jobs'])
-    assert all(j.get('model_key') not in ('mms_1b','qwen_17') for j in p['jobs'])
+    assert all(j.get('model_key') != 'mms_1b' for j in p['jobs'])
+    assert any(j.get('model_key') == 'qwen_17' for j in p['jobs'])
     assert len(p['jobs'])<100
     assert p==m.plan(ROOT/'config/experiment_matrix.json',seed=42)
 

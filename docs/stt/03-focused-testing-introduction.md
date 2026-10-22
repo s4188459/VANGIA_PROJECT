@@ -22,3 +22,22 @@ as new model results. Once the focused tests are complete, their measured result
 and limitations will be added here before making a final selection.
 
 See the [new tool setup](../../vangia-asr-lab/README.md) to continue the work.
+
+## Current test setup (2026-10-22)
+
+The new tool opens directly into three steps: Input ZIP, Models & Run, and
+Results & Export. The Offline group selects six candidates, including Qwen 1.7B;
+the Live group selects five and uses paced replay. These are test candidates,
+not approved deployment models. Qwen 1.7B has a configured local CPU/float32,
+four-thread worker on the current workstation. Its preliminary accuracy recovery
+does not replace a controlled timing test or new-data evaluation.
+
+Use **Check setup** before running. Choose models individually by clicking rows,
+then **Start benchmark**. Progress stays visible throughout execution. Repeats,
+chunk settings, storage paths and JSON configuration are under expandable advanced
+options. The full laboratory remains available under **Tools > Advanced laboratory**.
+The focused study is still unfinished; software smoke tests are not model-selection results.
+
+Integration check: the ASR Lab Qwen 1.7B worker successfully loaded and returned
+a nonempty transcript for a three-second real-audio clip on 2026-10-22. This is
+a technical smoke check only, not an accuracy or controlled latency result.

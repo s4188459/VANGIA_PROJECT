@@ -88,8 +88,20 @@ class LabApp(Workbench, BaseLabApp):
 
 
 def launch(run_dir=None, smoke=False):
-    root=tk.Tk(); app=LabApp(root,run_dir)
+    from types import SimpleNamespace
+    from .benchmark_ui import BenchmarkWizard
+    root=tk.Tk(); root.withdraw()
+    app=SimpleNamespace(root=root,simple_mode=True)
+    wizard=BenchmarkWizard(app)
+    menu=tk.Menu(wizard.window)
+    tools=tk.Menu(menu,tearoff=False)
+    def open_advanced():
+        advanced=tk.Toplevel(wizard.window)
+        LabApp(advanced,run_dir)
+    tools.add_command(label='Advanced laboratory',command=open_advanced)
+    menu.add_cascade(label='Tools',menu=tools)
+    wizard.window.configure(menu=menu)
     if smoke:
-        root.update(); assert len(app.tabs.tabs()) == 7
-        root.after(100,root.destroy)
+        root.update(); assert len(wizard.tabs.tabs()) == 3
+        root.after(100,wizard.close)
     root.mainloop()

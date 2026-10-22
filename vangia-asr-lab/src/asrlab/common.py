@@ -44,4 +44,4 @@ def model_record(model_id):
     for m in registry()['models']:
         if model_id in (m['key'], m['canonical_model_id']):
             return m
-    raise ValueError('Checkpoint is outside the exact 9 primary + 2 deferred scope')
+    raise ValueError('Checkpoint is outside the configured candidate registry scope')

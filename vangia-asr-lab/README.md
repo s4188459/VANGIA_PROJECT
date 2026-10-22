@@ -21,22 +21,31 @@ and optional backend environments must be provisioned separately. Update local
 model paths and worker Python paths for the current machine; example paths from
 the old workstation are not portable.
 
-## Benchmark workflow
+## Simple workflow
 
-1. Choose **New benchmark (ZIP)**. Inspect audio and UTF-8 TXT pairings, or supply
-   metadata using `config/metadata.example.csv`.
-2. Review pairings/references, enter the actual local consent record ID, and import
-   into a new dataset folder.
-3. Select and configure candidates. **Check prerequisites** reports setup status,
-   not a model-quality result.
-4. Select `batch_file` or `paced_replay`, repeats and chunk settings. Start the
-   benchmark. Cancellation preserves completed work; resume requires unchanged
-   data and configuration. Each repeat loads a fresh model; this is not a warm-worker test.
-5. Review samples and export an analysis bundle. WER/CER are ratios (`0.15 = 15%`).
-   Failures and missing results remain explicit; exports do not declare a winner.
+The app opens directly into three steps; no need to navigate the full laboratory.
 
-CLI help: `.\asrlab.bat --help`. Configuration templates are in `config/`.
-Local `runs/`, environments, model weights and recordings are excluded from Git;
-copy needed inputs/results separately when moving machines. Exports may contain
-reference/hypothesis text and metadata. UI paint proxies are not physical display
-measurements. Historical data is development evidence, not held-out confirmation.
+1. **Input ZIP**: choose audio + matching TXT, enter your consent record ID, click
+   **1. Check ZIP**, review the pairs, then **2. Use this dataset**.
+2. **Models & Run**: choose **Offline group (6)** or **Live group (5)**. Click rows
+   to add/remove models without Ctrl. Offline uses whole files; Live uses paced
+   replay. Qwen 1.7B is included in Offline. Click **Check setup** and resolve any
+   missing paths with **Configure model**, then **Start benchmark**.
+3. **Results & Export**: watch automatic progress, select results to inspect samples,
+   then **Export results**. WER is a ratio (`0.15 = 15%`). Errors remain explicit.
+
+Only one repeat runs by default. Expand **Advanced run settings** for repeats,
+chunk/overlap, seed, output folder and JSON configuration. Input pairing/storage
+options and additional result analysis are also collapsed by default.
+**Tools > Advanced laboratory** opens the original detailed tools when needed.
+Cancellation is available in the always-visible progress area; **Resume saved
+benchmark** continues unchanged data/configuration.
+
+On this workstation Qwen 1.7B already has local weights, provenance and a worker
+Python configured and passes preflight. On a new machine these assets/environments
+must be copied or installed and their paths reconfigured; Git does not carry them.
+`Check setup` verifies prerequisites, not model quality or successful inference.
+
+CLI help: `.\asrlab.bat --help`. Local `runs/`, weights, environments and recordings
+are excluded from Git. Each repeat loads a fresh model; no warm-worker guarantee.
+Paced replay and UI paint proxies are not real microphone-to-display latency.
