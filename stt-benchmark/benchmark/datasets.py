@@ -3,6 +3,7 @@ import io
 import json
 import re
 import shutil
+import time
 import uuid
 import zipfile
 from datetime import datetime, timezone
@@ -26,7 +27,16 @@ def write_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(".tmp")
     temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
-    temporary.replace(path)
+    # Windows readers (including the progress UI) can briefly deny replacement.
+    # Retain the complete temporary file and retry; never truncate the old JSON.
+    for attempt in range(51):
+        try:
+            temporary.replace(path)
+            break
+        except PermissionError as exc:
+            if getattr(exc, 'winerror', None) not in (5, 32, 33) or attempt == 50:
+                raise
+            time.sleep(0.1)
 
 
 def read_json(path):

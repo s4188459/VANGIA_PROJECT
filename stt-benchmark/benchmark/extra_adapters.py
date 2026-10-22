@@ -17,8 +17,27 @@ def local_snapshot(config):
                 return snapshot_download(config['model'], local_files_only=True, cache_dir=cache)
             except Exception:
                 pass
-    return snapshot_download(config['model'], local_files_only=not config['allow_download'],
-                             cache_dir=str(Path(__file__).resolve().parents[1] / 'data' / 'hf-cache'))
+    # MMS has thousands of language adapters; fetch only supported languages and
+    # one safe weights format instead of downloading the whole repository.
+    patterns = None
+    if config['model'] == 'facebook/mms-1b-all':
+        patterns = ['config.json', 'preprocessor_config.json', 'tokenizer_config.json',
+                    'special_tokens_map.json', 'vocab.json', 'model.safetensors']
+        patterns += ['adapter.' + {'en': 'eng', 'vi': 'vie'}[lang] + '.safetensors'
+                     for lang in config.get('languages', ['en', 'vi'])]
+    elif config.get('backend') == 'qwen-asr':
+        patterns = ['*.json', '*.safetensors', 'merges.txt', 'vocab.json']
+    cache = Path(__file__).resolve().parents[1] / 'data'
+    try:
+        return snapshot_download(config['model'], local_files_only=not config['allow_download'],
+                                 cache_dir=str(cache / 'hf-cache'), allow_patterns=patterns)
+    except OSError as exc:
+        if getattr(exc, 'winerror', None) != 1314 or not config['allow_download']:
+            raise
+        # local_dir stores regular files and does not require Windows symlink rights.
+        return snapshot_download(config['model'], allow_patterns=patterns,
+                                 local_dir=str(cache / 'model-cache' / config['model'].replace('/', '--')))
+
 
 
 def samples(path):
